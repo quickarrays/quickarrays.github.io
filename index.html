@@ -22,6 +22,32 @@ html,body{text-size-adjust:none}html{background-color:#ddd;width:100%;font-famil
   cursor:pointer;
   }
   .qa-toggle-btn:active{ transform:translateY(1px); }
+
+  /* Data-structures compact view */
+  #qa-structures-box{ position:relative; }
+  #qa-compact-toggle{
+    position:absolute;
+    top:.25em;
+    right:.5em;
+    display:flex;
+    align-items:center;
+    gap:.35em;
+    font-weight:700;
+    background:#fff;
+    padding:.1em .35em;
+    border-radius:.25em;
+  }
+  #qa-structures-compact-controls{
+    margin:.25em;
+    padding:.2em;
+    display:flex;
+    align-items:center;
+    gap:.5em;
+    flex-wrap:wrap;
+  }
+  #qa-structures-add-select{ min-width:14em; }
+  #qa-structures-box.qa-compact-on #qa-structures-enabled .qa-itemlist-header{display:none!important}
+
 </style>
 <body>
   <div class=qa-header>
@@ -73,10 +99,14 @@ html,body{text-size-adjust:none}html{background-color:#ddd;width:100%;font-famil
       </div>
       <textarea class="qa-hidden qa-textarea" id=qa-transform-input placeholder="text[i] == 'a' ? 'b' : 'a'"></textarea>
     </div>
-    <div class=qa-description>Choose your data structures and factorizations (drag and drop or double-click):<br>
+    <div class=qa-description id=qa-structures-description>Choose your data structures and factorizations (drag and drop or double-click):<br>
       You can use drag and drop to reorder your selection!
     </div>
-    <div class=qa-itemlist>
+    <div class=qa-itemlist id=qa-structures-box>
+      <label id=qa-compact-toggle>
+        <input type=checkbox id=qa-compact-view>
+        Compact view
+      </label>
       <div id="qa-structures-enabled" class="qa-itemlist-enabled">
         <!-- remove: <input type=checkbox id=qa-structures-enabled-visible ...> -->
         <div class="qa-itemlist-header">
@@ -88,6 +118,12 @@ html,body{text-size-adjust:none}html{background-color:#ddd;width:100%;font-famil
         <div class="qa-item qa-structure qa-structure-index" data-ds="index_array">i<span class="qa-tooltiptext">Index Array</span></div>
         <div class="qa-item qa-structure qa-structure-index" data-ds="suffix_array">SA<span class="qa-tooltiptext">Suffix Array</span></div>
       </div>
+      <div id=qa-structures-compact-controls class=qa-hidden>
+        <select id=qa-structures-add-select>
+          <option value="" selected disabled>Add a structure…</option>
+        </select>
+      </div>
+      
       <div id="qa-structures-disabled-string" class="qa-itemlist-disabled">
         <div class="qa-itemlist-header">
           <span class="qa-itemlist-title">Strings</span>
@@ -357,4 +393,162 @@ html,body{text-size-adjust:none}html{background-color:#ddd;width:100%;font-famil
       render();
     }
 
+  </script>
+
+  <script>
+    // Compact view for the data-structures chooser
+    (function () {
+      const DESC_NORMAL = 'Choose your data structures and factorizations (drag and drop or double-click):<br>\n      You can use drag and drop to reorder your selection!';
+      const DESC_COMPACT = 'Choose your data structures and factorizations (use the dropdown to add; double-click to remove):<br>\n      You can use drag and drop to reorder your selection!';
+
+            const DISABLED_IDS = [
+        'qa-structures-disabled-string',
+        'qa-structures-disabled-index',
+        'qa-structures-disabled-length',
+        'qa-structures-disabled-factor'
+      ];
+
+function structureGroup(el) {
+        if (!el) return 'other';
+        if (el.classList.contains('qa-structure-string')) return 'string';
+        if (el.classList.contains('qa-structure-index')) return 'index';
+        if (el.classList.contains('qa-structure-length')) return 'length';
+        if (el.classList.contains('qa-structure-factor')) return 'factor';
+        return 'other';
+      }
+
+      const GROUP_TITLES = {
+        string: 'Strings',
+        index: 'Index arrays',
+        length: 'Length arrays',
+        factor: 'Factorizations',
+        other: 'Other'
+      };
+
+      function getSymbol(el) {
+        try {
+          if (typeof getOwnText === 'function') return getOwnText(el).trim();
+        } catch (_) {}
+        // Fallback: first text node
+        const node = Array.from(el.childNodes).find(n => n.nodeType === Node.TEXT_NODE);
+        return (node ? node.textContent : el.textContent).trim();
+      }
+
+      function getLabel(el) {
+        const sym = getSymbol(el);
+        const tt = el.querySelector('.qa-tooltiptext');
+        const desc = tt ? tt.textContent.trim() : '';
+        return desc ? `${sym} — ${desc}` : sym;
+      }
+
+      function rebuildDropdown() {
+        const select = document.getElementById('qa-structures-add-select');
+        if (!select || !window.structures_list) return;
+
+        // Keep placeholder
+        const placeholder = select.querySelector('option[value=""]');
+        select.innerHTML = '';
+        if (placeholder) select.appendChild(placeholder);
+        placeholder.selected = true;
+
+        const groups = { string: [], index: [], length: [], factor: [], other: [] };
+        for (const ds in structures_list.dictionary) {
+          if (!structures_list.dictionary.hasOwnProperty(ds)) continue;
+          if (structures_list.enabled(ds)) continue;
+          const el = structures_list.dictionary[ds];
+          groups[structureGroup(el)].push(el);
+        }
+
+        // Stable ordering: by label
+        for (const k in groups) {
+          groups[k].sort((a, b) => getLabel(a).localeCompare(getLabel(b)));
+        }
+
+        ['string', 'index', 'length', 'factor', 'other'].forEach(key => {
+          if (!groups[key].length) return;
+          const og = document.createElement('optgroup');
+          og.label = GROUP_TITLES[key] || key;
+          groups[key].forEach(el => {
+            const opt = document.createElement('option');
+            opt.value = el.dataset.ds;
+            opt.textContent = getLabel(el);
+            og.appendChild(opt);
+          });
+          select.appendChild(og);
+        });
+      }
+
+      function setCompactView(on) {
+        const desc = document.getElementById('qa-structures-description');
+        const controls = document.getElementById('qa-structures-compact-controls');
+        const box = document.getElementById('qa-structures-box');
+        if (box) box.classList.toggle('qa-compact-on', on);
+
+        if (desc) desc.innerHTML = on ? DESC_COMPACT : DESC_NORMAL;
+        if (controls) controls.classList.toggle('qa-hidden', !on);
+        DISABLED_IDS.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.classList.toggle('qa-hidden', on);
+        });
+
+        if (on) rebuildDropdown();
+      }
+
+      window.addEventListener('load', () => {
+        const cbx = document.getElementById('qa-compact-view');
+        const select = document.getElementById('qa-structures-add-select');
+        if (!cbx || !select) return;
+
+        // Keep dropdown in sync whenever the enabled/disabled sets change.
+        if (typeof window.updateArrays === 'function') {
+          const originalUpdateArrays = window.updateArrays;
+          window.updateArrays = function () {
+            const r = originalUpdateArrays.apply(this, arguments);
+            if (cbx.checked) rebuildDropdown();
+            return r;
+          };
+        }
+
+
+        // Keep dropdown in sync even when structures are toggled via double-click.
+        let rebuildPending = false;
+        const scheduleRebuild = () => {
+          if (!cbx.checked) return;
+          if (rebuildPending) return;
+          rebuildPending = true;
+          requestAnimationFrame(() => {
+            rebuildPending = false;
+            rebuildDropdown();
+          });
+        };
+
+        const watchEls = [
+          document.getElementById('qa-structures-enabled'),
+          ...DISABLED_IDS.map(id => document.getElementById(id))
+        ].filter(Boolean);
+
+        const obs = new MutationObserver(scheduleRebuild);
+        watchEls.forEach(el => obs.observe(el, { childList: true }));
+
+        const structuresBox = document.getElementById('qa-structures-box');
+        if (structuresBox) structuresBox.addEventListener('dblclick', scheduleRebuild, true);
+
+        cbx.addEventListener('change', () => {
+          setCompactView(cbx.checked);
+        });
+
+        select.addEventListener('change', () => {
+          const ds = select.value;
+          if (!ds || !window.structures_list) return;
+          structures_list.enable(ds);
+          // Reset to placeholder after enabling.
+          const placeholder = select.querySelector('option[value=""]');
+          if (placeholder) placeholder.selected = true;
+          rebuildDropdown();
+        });
+
+        // Initial state
+        setCompactView(false);
+      });
+    })();
   </script>

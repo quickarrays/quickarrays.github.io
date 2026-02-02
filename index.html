@@ -375,13 +375,25 @@ html,body{text-size-adjust:none}html{background-color:#ddd;width:100%;font-famil
         return Array.from(container.querySelectorAll(':scope > .qa-item'));
       }
 
-      function render() {
-        btn.textContent = shown ? 'hide' : 'show';
-        btn.setAttribute('aria-expanded', String(shown));
-
+      function applyVisibilityToItems() {
         getItems().forEach(el => el.classList.toggle('qa-hidden', !shown));
         if (colon) colon.classList.toggle('qa-hidden', !shown);
       }
+
+      function render() {
+        btn.textContent = shown ? 'hide' : 'show';
+        btn.setAttribute('aria-expanded', String(shown));
+        applyVisibilityToItems();
+      }
+
+      // Keep "hidden" state consistent when items are moved into/out of this list later.
+      const obs = new MutationObserver(() => {
+        if (!shown) {
+          getItems().forEach(el => el.classList.add('qa-hidden'));
+          if (colon) colon.classList.add('qa-hidden');
+        }
+      });
+      obs.observe(container, { childList: true });
 
       btn.addEventListener('click', (e) => {
         e.preventDefault();

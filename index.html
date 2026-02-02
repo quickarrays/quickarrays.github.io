@@ -24,19 +24,6 @@ html,body{text-size-adjust:none}html{background-color:#ddd;width:100%;font-famil
   .qa-toggle-btn:active{ transform:translateY(1px); }
 
   /* Data-structures compact view */
-  #qa-structures-box{ position:relative; }
-  #qa-compact-toggle{
-    position:absolute;
-    top:.25em;
-    right:.5em;
-    display:flex;
-    align-items:center;
-    gap:.35em;
-    font-weight:700;
-    background:#fff;
-    padding:.1em .35em;
-    border-radius:.25em;
-  }
   #qa-structures-compact-controls{
     margin:.25em;
     padding:.2em;
@@ -103,10 +90,6 @@ html,body{text-size-adjust:none}html{background-color:#ddd;width:100%;font-famil
       You can use drag and drop to reorder your selection!
     </div>
     <div class=qa-itemlist id=qa-structures-box>
-      <label id=qa-compact-toggle>
-        <input type=checkbox id=qa-compact-view>
-        Compact view
-      </label>
       <div id="qa-structures-enabled" class="qa-itemlist-enabled">
         <!-- remove: <input type=checkbox id=qa-structures-enabled-visible ...> -->
         <div class="qa-itemlist-header">
@@ -192,15 +175,17 @@ html,body{text-size-adjust:none}html{background-color:#ddd;width:100%;font-famil
         <div class="qa-item qa-structure qa-structure-length" data-ds=substring_complexity>SC<span class=qa-tooltiptext>Substring Complexity Array</span></div>
       </div>
     </div>
-    <div class=qa-options>
-      <label class=qa-option>Prepend:&nbsp;<input id=qa-prepend-input name=qa-prepend-input class=qa-shorttext></label>
-      <label class=qa-option>Append:&nbsp; <input id=qa-append-input name=qa-append-input class=qa-shorttext></label>
-      <label class=qa-option><input type=checkbox class=qa-option-cbx name=qa-option-dollar data-opt=dollar checked>Append '$'</label>
-      <label class=qa-option><input type=checkbox class=qa-option-cbx name=qa-option-baseone data-opt=baseone checked>Base Indices on '1'</label>
-      <label class=qa-option><input type=checkbox class=qa-option-cbx name=qa-option-whitespace data-opt=whitespace checked>Whitespaces as ⎵ and ↵</label>
-      <label class=qa-option><input type=checkbox class=qa-option-cbx name=qa-option-facttext data-opt=facttext checked>Factorization as Bars</label>
-      <label class=qa-option><input type=checkbox class=qa-option-cbx name=qa-option-tabularize data-opt=tabularize checked>Tabularize Text</label>
-      <label class=qa-option>Separator:&nbsp;&nbsp;<input id=qa-separator-input class=qa-shorttext></label>
+        <div class=qa-options>
+      <label class=qa-option><input type=checkbox id=qa-compact-view>Compact view</label>
+      <label class=qa-option><input type=checkbox id=qa-show-advanced-options>Show advanced options</label>
+<label class="qa-option qa-advanced-option">Prepend:&nbsp;<input id=qa-prepend-input name=qa-prepend-input class=qa-shorttext></label>
+      <label class="qa-option qa-advanced-option">Append:&nbsp; <input id=qa-append-input name=qa-append-input class=qa-shorttext></label>
+      <label class="qa-option qa-advanced-option"><input type=checkbox class=qa-option-cbx name=qa-option-dollar data-opt=dollar checked>Append '$'</label>
+      <label class="qa-option qa-advanced-option"><input type=checkbox class=qa-option-cbx name=qa-option-baseone data-opt=baseone checked>Base Indices on '1'</label>
+      <label class="qa-option qa-advanced-option"><input type=checkbox class=qa-option-cbx name=qa-option-whitespace data-opt=whitespace checked>Whitespaces as ⎵ and ↵</label>
+      <label class="qa-option qa-advanced-option"><input type=checkbox class=qa-option-cbx name=qa-option-facttext data-opt=facttext checked>Factorization as Bars</label>
+      <label class="qa-option qa-advanced-option"><input type=checkbox class=qa-option-cbx name=qa-option-tabularize data-opt=tabularize checked>Tabularize Text</label>
+      <label class="qa-option qa-advanced-option">Separator:&nbsp;&nbsp;<input id=qa-separator-input class=qa-shorttext></label>
     </div>
     <div class=qa-description>
       QuickArrays built the following data structures and factorizations for you in
@@ -367,7 +352,15 @@ html,body{text-size-adjust:none}html{background-color:#ddd;width:100%;font-famil
         if (cvOn !== cvDefault) t = t.set("compact", cvOn ? "1" : "0");
       }
 
-      const hidden = [];
+      
+
+      const adv = document.getElementById("qa-show-advanced-options");
+      if (adv) {
+        const advDefault = !(window.matchMedia && window.matchMedia("(max-width: 640px)").matches);
+        const advOn = !!adv.checked;
+        if (advOn !== advDefault) t = t.set("adv", advOn ? "1" : "0");
+      }
+const hidden = [];
       ["qa-structures-enabled","qa-structures-disabled-string","qa-structures-disabled-index","qa-structures-disabled-length","qa-structures-disabled-factor"].forEach((id) => {
         const el = document.getElementById(id);
         if (!el) return;
@@ -382,6 +375,7 @@ html,body{text-size-adjust:none}html{background-color:#ddd;width:100%;font-famil
       const __hidden = $.query.get("hidden_lists").toString();
       window.qa_hidden_lists = new Set(__hidden ? __hidden.split(",").filter(Boolean) : []);
       window.qa_compact_param = $.query.get("compact").toString();
+      window.qa_adv_param = $.query.get("adv").toString();
 }function updateTextAreas(){updateTextArea(qa_text),updateTextArea(qa_ds_output)}function updateTextArea(t){t.style.height="",t.style.height=10+t.scrollHeight+"px"}var wasWhitespace=!1;function updateWhitespaces(){if(options_list.enabled("whitespace")){const t=qa_text.selectionStart,e=qa_text.selectionEnd;qa_text.value=encodeWhitespaces(qa_text.value),qa_text.selectionStart=t,qa_text.selectionEnd=e,wasWhitespace=!0}else if(wasWhitespace){const t=qa_text.selectionStart,e=qa_text.selectionEnd;qa_text.value=decodeWhitespaces(qa_text.value),qa_text.selectionStart=t,qa_text.selectionEnd=e,wasWhitespace=!1}}function eval_with_context(context,js_code){return eval("with(context) { "+js_code+" }")}function custom_transform_text(t,e){for(var n="",r=0;r<t.length;r++)try{const i=eval_with_context({i:r,text:t},e);n+=void 0!==i?i:t[r]}catch(e){return alert("Error in transformation: "+e.message),qa_transform_active.checked=!1,t}return n}function transform_text(t){const e=qa_transform_list.value;if("none"==e)return t;if("custom"==e)return 0==qa_transform_active.checked?t:custom_transform_text(t,qa_transform_input.value);return build_ds(t,structure_flags[e])[e]}function generate_text(){return"custom"==qa_generate_string_list.value?qa_text.value:qa_generate_string_list.value in string_generators?string_generators[qa_generate_string_list.value](parseInt(qa_generate_string_range.value)):"Unknown string generator: "+qa_generate_string_list.value}function construct_text(){qa_generate_string_range.value;let t=generate_text();return options_list.enabled("whitespace")&&(t=decodeWhitespaces(t)),t||(t=qa_text.placeholder),t=transform_text(t),0==t.length?(qa_ds_output.value="",void(qa_counter_output.value="")):(qa_prepend_input.value&&(t=qa_prepend_input.value+t),qa_append_input.value&&(t+=qa_append_input.value),options_list.enabled("dollar")&&(t+="\0"),t)}function prettify_row(t,e,n,r,i,a){structures_list.isIndex(e)&&(0!=i&&(n=increment_array(n)),n=replace_invalid_position(n,i+t.length));const o=ds_name2html[e]?ds_name2html[e]:e;return structures_list.isString(e)&&(n=n.split("\0").join("$")),a?(structures_list.isString(e)?(options_list.enabled("whitespace")&&(n=encodeWhitespaces(n)),n=prettify_string(n,r,i,options_list.enabled("tabularize"))):n=structures_list.isFactorization(e)?options_list.enabled("facttext")?prettify_factorization(options_list.enabled("whitespace")?encodeWhitespaces(t):t,n,r,i):prettify_array(n.map(t=>t?1:0),r,i):prettify_array(n,r,i),{name:o,data:n}):{name:o,data:n}}function fill_updates(t){const e=decodeWhitespaces(qa_separator_input.value);let n=0;structures_list.forEachEnabled(function(t){const e=ds_name2html[t]?ds_name2html[t]:t;e.length>n&&(n=e.length)});const r=options_list.enabled("baseone")?1:0,i=[];if(structures_list.forEachEnabled(function(n){let a=t[n];a?i.push(prettify_row(t.text,n,a,e,r,"plain"==qa_output_select.value)):i.push("Function "+n+": not defined")}),"plain"==qa_output_select.value){const t=i.map(t=>pad_right(t.name+":"," ",n+2)+t.data);qa_ds_output.value=t.join("\n")}else"latex"==qa_output_select.value?qa_ds_output.value=export_latex(i):"markdown"==qa_output_select.value?qa_ds_output.value=export_markdown(i):qa_ds_output.value=export_csv(i);enabled_counters=qa_counter_automatic.checked?structures_list:counters_list;const a=[];enabled_counters.forEachEnabled(function(e){let n=t["counter_"+e];const r=counter_name2html[e]?counter_name2html[e]:e;if(void 0===n){if(qa_counter_automatic.checked)return;a.push(e+": not defined")}else a.push(r+": "+n)}),qa_counter_output.innerHTML=[...a].map(t=>'<span class="qa-item">'+t+"</span>").join("&nbsp;"),updateTextAreas(),update_history()}var qa_worker=null,qa_is_loaded=!1,qa_tutorial_open_button,qa_tutorial_close_button,qa_tutorial_overlay,qa_tutorial_title,qa_tutorial_content,qa_tutorial_oeis,qa_tutorial_cite,qa_tutorial_wikipedia,qa_output_select,qa_timeout_range,qa_timeout_value,qa_computation_status;function updateArrays(){if(!qa_is_loaded||null!==qa_worker)return;qa_separator_input.value=encodeWhitespaces(qa_separator_input.value),updateWhitespaces();let t=0;structures_list.forEachEnabled(function(e){t|=structure_flags[e]}),counters_list.forEachEnabled(function(e){structure_flags[e]&&(t|=structure_flags[e]);const n="counter_"+e;structure_flags[n]&&(t|=structure_flags[n])});const e=construct_text(),n=document.querySelectorAll('script[type="text/js-worker"]');if(!n||!n[0].innerHTML){qa_computation_status.textContent="⚠️ Warning: No worker scripts found!",qa_timeout_range.disabled=!0;const n=build_ds(e,t);return n.text=e,void fill_updates(n)}const r=new Blob(Array.prototype.map.call(document.querySelectorAll("script[type='text/js-worker']"),t=>t.textContent),{type:"text/javascript"}),i=window.URL.createObjectURL(r),a=Number(qa_timeout_range.value);qa_computation_status.textContent=`⏳ Computing... (timeout: ${a}s)`;const o=Date.now(),s=a>0?setTimeout(()=>{qa_worker.terminate(),qa_worker=null,qa_computation_status.textContent=`⚠️ Killed after ${a}s`},1e3*a):null;(qa_worker=new Worker(i)).onerror=t=>{qa_worker.terminate(),qa_worker=null,clearTimeout(s),qa_computation_status.textContent=`❌ Error during computation: ${t.message}`},qa_worker.postMessage([e,t]),qa_worker.onmessage=t=>{const n=t.data;n.text=e,qa_worker.terminate(),qa_worker=null,clearTimeout(s),qa_computation_status.textContent=`✅ Computation finished in ${((Date.now()-o)/1e3).toFixed(2)}s`,fill_updates(n)}}function initDragAndDrop(t,e){var n=Array.isArray(t)?t:[t,e],r={"qa-structures-disabled-string":"qa-structure-string","qa-structures-disabled-index":"qa-structure-index","qa-structures-disabled-length":"qa-structure-length","qa-structures-disabled-factor":"qa-structure-factor"};function i(t){return t&&"qa-structures-enabled"===t.id?"qa-enabled":"qa-"+(t&&t.id?t.id:"x")}function a(t,e){if("qa-structures-enabled"===t)return!0;var n=r[t];return!!n&&e.classList.contains(n)}for(var o=0;o<n.length;o++){var s=n[o];s&&Sortable.create(s,{group:{name:i(s),pull:!0,put:function(t,e,n){return a(t.el.id,n)}},draggable:".qa-item",ghostClass:"qa-item-ghost",dragClass:"qa-item-drag",onSort:updateArrays})}}function update_tutorial(t,e){if(void 0===tutorials[t])return;const n=tutorials[t];qa_tutorial_title.innerHTML=n.title,qa_tutorial_content.innerHTML=n.content,"undefined"!=typeof MathJax&&MathJax.typeset([qa_tutorial_content]),void 0!==n.oeis?(qa_tutorial_oeis.style.display="block",qa_tutorial_oeis.innerHTML="Converges to OEIS sequence "+n.oeis,qa_tutorial_oeis.href="https://oeis.org/"+n.oeis):qa_tutorial_oeis.style.display="none",void 0!==n.cite?(qa_tutorial_cite.style.display="block",qa_tutorial_cite.href=n.cite,void 0!==citations&&"undefined"!==citations[n.cite]&&(qa_tutorial_cite.innerHTML=citations[n.cite])):qa_tutorial_cite.style.display="none",void 0!==n.wikipedia?(qa_tutorial_wikipedia.style.display="block",qa_tutorial_wikipedia.innerHTML="Wikipedia Article about "+e,qa_tutorial_wikipedia.href="https://en.wikipedia.org/wiki/"+n.wikipedia):qa_tutorial_wikipedia.style.display="none",qa_tutorial_open_button.innerHTML="Tell me more about <b>"+e+"</b>!",qa_tutorial_open_button.style.display="inline-block"}window.onload=function(){qa_tutorial_open_button=document.getElementById("qa-tutorial-open-button"),qa_tutorial_close_button=document.getElementById("qa-tutorial-close-button"),qa_tutorial_overlay=document.getElementById("qa-tutorial-overlay"),qa_tutorial_title=document.getElementById("qa-tutorial-title"),qa_tutorial_content=document.getElementById("qa-tutorial-content"),qa_tutorial_oeis=document.getElementById("qa-tutorial-oeis"),qa_tutorial_cite=document.getElementById("qa-tutorial-cite"),qa_tutorial_wikipedia=document.getElementById("qa-tutorial-wikipedia"),qa_timeout_range=document.getElementById("qa-timeout-range"),qa_timeout_value=document.getElementById("qa-timeout-value"),qa_timeout_range.oninput=()=>{qa_timeout_value.textContent=qa_timeout_range.value,update_history()},qa_computation_status=document.getElementById("qa-computation-status"),qa_output_select=document.getElementById("qa-output-select"),qa_counter_itemlists=document.getElementById("qa-counter-itemlists"),qa_counter_automatic=document.getElementById("qa-counter-automatic"),qa_transform_active=document.getElementById("qa-transform-active"),qa_transform_list=document.getElementById("qa-transform-list"),qa_transform_input=document.getElementById("qa-transform-input"),qa_transform_active_span=document.getElementById("qa-transform-active-span"),qa_text=document.getElementById("qa-text"),qa_ds_output=document.getElementById("qa-ds-output"),qa_counter_output=document.getElementById("qa-counter-output"),qa_separator_input=document.getElementById("qa-separator-input"),qa_prepend_input=document.getElementById("qa-prepend-input"),qa_append_input=document.getElementById("qa-append-input"),qa_generate_string_list=document.getElementById("qa-generate-string-list"),qa_generate_string_range=document.getElementById("qa-generate-string-range"),qa_generate_string_rank=document.getElementById("qa-generate-string-rank"),qa_generate_string_span=document.getElementById("qa-generate-string-span"),timeout_default=qa_timeout_range.value,qa_separator_input.value=encodeWhitespaces(separator_default),generate_string_default=qa_generate_string_list.value,generate_string_range_default=qa_generate_string_range.value,transform_default=qa_transform_list.value,prepend_default=qa_prepend_input.value,append_default=qa_append_input.value;const t=document.getElementById("qa-structures-enabled"),e={string:document.getElementById("qa-structures-disabled-string"),index:document.getElementById("qa-structures-disabled-index"),length:document.getElementById("qa-structures-disabled-length"),factor:document.getElementById("qa-structures-disabled-factor")};!function(){const t=document.getElementById("qa-structures-disabled-source");if(!t)return;const n=Array.from(t.querySelectorAll(".qa-structure"));n.forEach(t=>{t.classList.contains("qa-structure-string")?e.string.appendChild(t):t.classList.contains("qa-structure-index")?e.index.appendChild(t):t.classList.contains("qa-structure-length")?e.length.appendChild(t):t.classList.contains("qa-structure-factor")?e.factor.appendChild(t):e.index.appendChild(t)}),t.remove()}();const n=document.getElementById("qa-counter-enabled"),r=document.getElementById("qa-counter-disabled");structures_list=new DataStructureList(t,e,updateArrays,!0),document.querySelectorAll(".qa-structure").forEach(t=>{structures_list.add(t)}),structures_default=structures_list.getEnabled(),counters_list=new CounterList(n,r,updateArrays,!0),document.querySelectorAll(".qa-counter").forEach(t=>{counters_list.add(t)}),counters_default=counters_list.getEnabled(),options_list=new OptionList(updateArrays),document.querySelectorAll(".qa-option-cbx").forEach(t=>{options_list.add(t)}),options_default=options_list.getEnabled(),initDragAndDrop([t,e.string,e.index,e.length,e.factor]),initDragAndDrop(n,r),load_history_internal(),qa_tutorial_open_button.onclick=function(){qa_tutorial_overlay.style.display="block"},qa_tutorial_close_button.onclick=function(){qa_tutorial_overlay.style.display="none"},window.onclick=function(t){t.target==qa_tutorial_overlay&&(qa_tutorial_overlay.style.display="none")},document.querySelectorAll(".qa-item").forEach(t=>{void 0!==tutorials[t.dataset.ds]&&(t.onmouseover=function(){update_tutorial(t.dataset.ds,t.innerHTML)})});const i=[qa_transform_active,qa_prepend_input,qa_append_input,qa_transform_list,qa_transform_input,qa_generate_string_list,qa_output_select];for(const t in i)i[t].addEventListener("change",function(){updateArrays()}),i[t].addEventListener("input",function(){updateArrays()});qa_counter_automatic.addEventListener("change",function(){changeVisibility(qa_counter_itemlists,!qa_counter_automatic.checked),updateArrays()}),qa_generate_string_range.addEventListener("input",function(){qa_generate_string_rank.innerHTML=qa_generate_string_range.value,updateArrays()}),qa_transform_list.addEventListener("change",function(){qa_transform_active.checked=!1,updateArrays()}),qa_generate_string_list.addEventListener("change",function(){const t="custom"!=this.value;changeVisibility(qa_generate_string_span,t),changeVisibility(qa_text,!t);const e=this.selectedIndex,n=this.options[e].innerHTML;update_tutorial(this.value,n),updateArrays()}),qa_transform_list.addEventListener("change",function(){const t="custom"==this.value;changeVisibility(qa_transform_input,t),changeVisibility(qa_transform_active_span,t);const e=this.selectedIndex,n=this.options[e].innerHTML;update_tutorial(this.value,n),updateArrays()}),qa_transform_input.addEventListener("input",function(){qa_transform_active.checked=!1}),document.getElementById("qa-counter-disabled-visible").addEventListener("change",function(){toggleVisibility("qa-counter-disabled",this.checked)}),document.getElementById("qa-counter-enabled-visible").addEventListener("change",function(){toggleVisibility("qa-counter-enabled",this.checked)}),document.querySelectorAll(".qa-structure").forEach(t=>{ds_name2html[t.dataset.ds]=getOwnText(t)}),document.querySelectorAll(".qa-counter").forEach(t=>{counter_name2html[t.dataset.ds]=getOwnText(t)}),qa_text.oninput=updateArrays,qa_text.onpropertychange=updateArrays,qa_separator_input.oninput=updateArrays,qa_separator_input.onpropertychange=updateArrays,update_history_internal(),qa_is_loaded=!0,updateArrays();setupShowHide('qa-structures-enabled',true);setupShowHide('qa-structures-disabled-string',true);setupShowHide('qa-structures-disabled-index',true);setupShowHide('qa-structures-disabled-length',true);setupShowHide('qa-structures-disabled-factor',true)};
   </script>
   <script>
@@ -599,3 +593,31 @@ function structureGroup(el) {
       });
     })();
   </script>
+  <script>
+    // Show/hide advanced options (URL-stored state)
+    (function () {
+      function apply(on) {
+        document.querySelectorAll('.qa-advanced-option').forEach(el => {
+          el.classList.toggle('qa-hidden', !on);
+        });
+      }
+
+      window.addEventListener('load', () => {
+        const cbx = document.getElementById('qa-show-advanced-options');
+        if (!cbx) return;
+
+        const urlAdv = (typeof $ !== 'undefined' && $.query) ? $.query.get('adv').toString() : (window.qa_adv_param || '');
+        const defaultOn = !(window.matchMedia && window.matchMedia('(max-width: 640px)').matches);
+        const initialOn = urlAdv === '1' ? true : urlAdv === '0' ? false : defaultOn;
+
+        cbx.checked = initialOn;
+        apply(initialOn);
+
+        cbx.addEventListener('change', () => {
+          apply(cbx.checked);
+          if (typeof update_history === 'function') update_history();
+        });
+      });
+    })();
+  </script>
+

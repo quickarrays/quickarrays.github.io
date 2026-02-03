@@ -2278,6 +2278,8 @@ function fill_updates(t) {
   } else "latex" == qa_output_select.value ? qa_ds_output.value = export_latex(i) : "markdown" == qa_output_select.value ? qa_ds_output.value = export_markdown(i) : qa_ds_output.value = export_csv(i);
   enabled_counters = qa_counter_automatic.checked ? structures_list : counters_list;
   const a = [];
+  // Always show the text length counter (cannot be disabled).
+  a.push(`n : ${t && t.text ? t.text.length : "???"}`);
   enabled_counters.forEachEnabled(function(e) {
     let n = t["counter_" + e];
     const r = counter_name2html[e] ? counter_name2html[e] : e;
@@ -2569,7 +2571,8 @@ function structureGroup(el) {
         const sym = getSymbol(el);
         const tt = el.querySelector('.qa-tooltiptext');
         const desc = tt ? tt.textContent.trim() : '';
-        return desc ? `${sym} — ${desc}` : sym;
+        return sym;
+        //return desc ? `${sym} — ${desc}` : sym;
       }
 
       function rebuildDropdown() {

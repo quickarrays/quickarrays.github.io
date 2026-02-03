@@ -2290,8 +2290,13 @@ var qa_worker = null,
   qa_is_loaded = !1,
   qa_tutorial_open_button, qa_tutorial_close_button, qa_tutorial_overlay, qa_tutorial_title, qa_tutorial_content, qa_tutorial_oeis, qa_tutorial_cite, qa_tutorial_wikipedia, qa_output_select, qa_timeout_range, qa_timeout_value, qa_computation_status;
 
+var update_requested = !1;
+
 function updateArrays() {
-  if (!qa_is_loaded || null !== qa_worker) return;
+  if (!qa_is_loaded || null !== qa_worker) {
+    update_requested = !0;
+    return;
+  }
   qa_separator_input.value = encodeWhitespaces(qa_separator_input.value), updateWhitespaces();
   let t = 0;
   structures_list.forEachEnabled(function(e) {
@@ -2322,10 +2327,18 @@ function updateArrays() {
       qa_worker.terminate(), qa_worker = null, qa_computation_status.textContent = `Killed after ${s}s`
     }, 1e3 * s) : null;
   (qa_worker = new Worker(o)).onerror = t => {
-    qa_worker.terminate(), qa_worker = null, clearTimeout(l), qa_computation_status.textContent = `Error during computation: ${t.message}`
+    qa_worker.terminate(), qa_worker = null, clearTimeout(l), qa_computation_status.textContent = `Error during computation: ${t.message}`;
+    if (update_requested) {
+      update_requested = !1;
+      updateArrays();
+    }
   }, qa_worker.postMessage([e, t]), qa_worker.onmessage = t => {
     const n = t.data;
-    n.text = e, qa_worker.terminate(), qa_worker = null, clearTimeout(l), qa_computation_status.textContent = `Computation finished in ${((Date.now()-c)/1e3).toFixed(2)}s`, fill_updates(n)
+    n.text = e, qa_worker.terminate(), qa_worker = null, clearTimeout(l), qa_computation_status.textContent = `Computation finished in ${((Date.now()-c)/1e3).toFixed(2)}s`, fill_updates(n);
+    if (update_requested) {
+      update_requested = !1;
+      updateArrays();
+    }
   }
 }
 

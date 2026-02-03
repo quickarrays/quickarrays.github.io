@@ -483,7 +483,7 @@ body {
       :
     </div>
     <textarea class=qa-textarea style=flex-grow:1;line-height:175% id=qa-ds-output readonly></textarea>
-    <div id=qa-counter-output></div>
+    <div id=qa-counter-output class=qa-itemlist-enabled></div>
     <div class=qa-description>Choose your counters
       <input type=checkbox id=qa-counter-automatic value=1 checked>
       <label for=qa-counter-automatic>automatically</label>.
@@ -2287,7 +2287,7 @@ function fill_updates(t) {
       if (qa_counter_automatic.checked) return;
       a.push(e + ": not defined")
     } else a.push(r + ": " + n)
-  }), qa_counter_output.innerHTML = [...a].map(t => '<span class="qa-item">' + t + "</span>").join("&nbsp;"), updateTextAreas(), update_history()
+  }), qa_counter_output.innerHTML = [...a].map(t => '<div class="qa-item">' + t + "</div>").join(""), updateTextAreas(), update_history()
 }
 var qa_worker = null,
   qa_is_loaded = !1,

@@ -284,13 +284,13 @@ body {
 }
 
 .qa-toggle-btn {
-  margin-left: .5em;
-  padding: .05em .5em;
-  border: 1px solid #9b9;
-  background: #fff;
-  border-radius: .25em;
+  margin-left: 0em;
+  padding: 0em;
+  border: none;
+  background: none;
   font: inherit;
   cursor: pointer;
+  text-decoration-line: underline;
 }
 
 .qa-toggle-btn:active {
@@ -383,7 +383,7 @@ body {
         <!-- remove: <input type=checkbox id=qa-structures-enabled-visible ...> -->
         <div class="qa-itemlist-header">
           <span class="qa-itemlist-title">Enabled<span class="qa-itemlist-colon">:</span></span>
-          <button type="button" class="qa-toggle-btn" aria-expanded="true">hide</button>
+          <button type="button" class="qa-toggle-btn" aria-expanded="true">(hide)</button>
         </div>
         <div class="qa-item qa-structure qa-structure-string" data-ds="text">T</div>
         <div class="qa-item qa-structure qa-structure-index" data-ds="index_array">i<span class="qa-tooltiptext">Index Array</span></div>
@@ -398,25 +398,25 @@ body {
       <div id="qa-structures-disabled-string" class="qa-itemlist-disabled">
         <div class="qa-itemlist-header">
           <span class="qa-itemlist-title">Strings<span class="qa-itemlist-colon">:</span></span>
-          <button type="button" class="qa-toggle-btn" aria-expanded="true">hide</button>
+          <button type="button" class="qa-toggle-btn" aria-expanded="true">(hide)</button>
         </div>
       </div>
       <div id="qa-structures-disabled-index" class="qa-itemlist-disabled">
         <div class="qa-itemlist-header">
           <span class="qa-itemlist-title">Index arrays<span class="qa-itemlist-colon">:</span></span>
-          <button type="button" class="qa-toggle-btn" aria-expanded="true">hide</button>
+          <button type="button" class="qa-toggle-btn" aria-expanded="true">(hide)</button>
         </div>
       </div>
       <div id="qa-structures-disabled-length" class="qa-itemlist-disabled">
         <div class="qa-itemlist-header">
           <span class="qa-itemlist-title">Length arrays<span class="qa-itemlist-colon">:</span></span>
-          <button type="button" class="qa-toggle-btn" aria-expanded="true">hide</button>
+          <button type="button" class="qa-toggle-btn" aria-expanded="true">(hide)</button>
         </div>
       </div>
       <div id="qa-structures-disabled-factor" class="qa-itemlist-disabled">
         <div class="qa-itemlist-header">
           <span class="qa-itemlist-title">Factorizations<span class="qa-itemlist-colon">:</span></span>
-          <button type="button" class="qa-toggle-btn" aria-expanded="true">hide</button>
+          <button type="button" class="qa-toggle-btn" aria-expanded="true">(hide)</button>
         </div>
       </div>
       <div id="qa-structures-disabled-source" class="qa-hidden">
@@ -598,7 +598,7 @@ body {
     </div>
     <div style=text-align:right>
       Questions or problems? Feel free to use our <a href=https://github.com/quickarrays/quickarrays.github.io/issues>bug tracker</a>, or drop <a href=https://ellert.xyz/>Jonas</a> or <a href=https://dkppl.de/>Dominik</a> a mail.
-      Like it? Cite us and give us <a href=https://github.com/quickarrays/quickarrays.github.io>a star at GitHub</a>!
+      Like it? Cite us and give us <a href=https://github.com/quickarrays/quickarrays.github.io>a star on GitHub</a>!
     </div>
   </div>
   <div id=qa-tutorial-overlay>
@@ -2441,7 +2441,7 @@ window.onload = function() {
       }
 
       function render() {
-        btn.textContent = shown ? 'hide' : 'show';
+        btn.textContent = shown ? '(hide)' : '(show)';
         btn.setAttribute('aria-expanded', String(shown));
         container.dataset.qaShown = shown ? '1' : '0';
         applyVisibilityToItems();

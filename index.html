@@ -19,7 +19,11 @@ textarea {
 
 html,
 body {
-  text-size-adjust: none
+  text-size-adjust: none;
+}
+
+body {
+  background-color: #fff;
 }
 
 html {
@@ -53,7 +57,6 @@ html {
 }
 
 body {
-  background-color: #fff;
   flex-direction: column;
   margin: 0;
   padding: 0;
@@ -94,34 +97,20 @@ body {
   display: block;
 }
 
+.qa-main {
+    max-width: 1856px;
+    margin: 1em;
+    padding: 1em;
+    align-self: center;
+}
+
 @media (width<=720px) {
   .qa-main {
     margin: 0;
-    padding: 1em
   }
-}
-
-@media (width>=721px) and (width<=1280px),
-(width>=721px) and (height<=720px) {
-  .qa-main {
-    margin: 1em;
-    padding: 1em
-  }
-}
-
-@media (width>=1281px) and (width<=1920px) and (height>=721px) {
-  .qa-main {
-    margin: 2em;
-    padding: 2em
-  }
-}
-
-@media (width>=1921px) and (height>=721px) {
-  .qa-main {
-    min-width: 1856px;
-    max-width: 1856px;
-    margin: 2em auto;
-    padding: 2em
+  
+  body {
+    background-color: #ddd;
   }
 }
 

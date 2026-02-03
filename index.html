@@ -1409,7 +1409,7 @@ function build_ds(t, e = -1) {
     bbw_indices: K,
     bbw_transform: Q,
     inverse_bbw_transform: tt,
-    counter_text: number_of_runs(i),
+    counter_text: a,//number_of_runs(i),
     counter_lyndon_factorization: number_of_factors(M),
     counter_lzss_factorization: number_of_factors(L),
     counter_lzssno_factorization: number_of_factors(P),
@@ -2237,8 +2237,6 @@ function generate_text() {
     if (cand.length > limit) break;
     best = cand;
   }
-  
-  alert(best.length);
 
   return best;
 }

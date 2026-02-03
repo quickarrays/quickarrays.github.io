@@ -492,13 +492,13 @@ body {
     </div>
     <div class="qa-hidden qa-itemlist" id=qa-counter-itemlists>
       <div id=qa-counter-enabled class=qa-itemlist-enabled>
-        <input type=checkbox id=qa-counter-enabled-visible value=1 checked>
-        <div class=qa-itemlist-header>Enabled: </div>
+        <!--<input type=checkbox id=qa-counter-enabled-visible value=1 checked>-->
+        <div class=qa-itemlist-header><span class=qa-itemlist-title>Enabled:</span></div>
         <div class="qa-counter qa-item" data-ds=text>T</div>
       </div>
       <div id=qa-counter-disabled class=qa-itemlist-disabled>
-        <input type=checkbox id=qa-counter-disabled-visible value=1 checked>
-        <div class=qa-itemlist-header>Disabled: </div>
+        <!--<input type=checkbox id=qa-counter-disabled-visible value=1 checked>-->
+        <div class=qa-itemlist-header><span class=qa-itemlist-title>Disabled:</span></div>
         <div class="qa-counter qa-item" data-ds=delta>
           δ
           <div class=qa-tooltiptext>Substring Complexity Measure</div>
@@ -2451,11 +2451,14 @@ window.onload = function() {
     update_tutorial(this.value, n), updateArrays()
   }), qa_transform_input.addEventListener("input", function() {
     qa_transform_active.checked = !1
-  }), document.getElementById("qa-counter-disabled-visible").addEventListener("change", function() {
+  }), 
+  /* document.getElementById("qa-counter-disabled-visible").addEventListener("change", function() {
     toggleVisibility("qa-counter-disabled", this.checked)
-  }), document.getElementById("qa-counter-enabled-visible").addEventListener("change", function() {
+  }), 
+  document.getElementById("qa-counter-enabled-visible").addEventListener("change", function() {
     toggleVisibility("qa-counter-enabled", this.checked)
-  }), document.querySelectorAll(".qa-structure").forEach(t => {
+  }), */
+  document.querySelectorAll(".qa-structure").forEach(t => {
     ds_name2html[t.dataset.ds] = getOwnText(t)
   }), document.querySelectorAll(".qa-counter").forEach(t => {
     counter_name2html[t.dataset.ds] = getOwnText(t)

@@ -348,9 +348,9 @@ body {
         <option value=vtm_word title="variant ternary squarefree Thue–Morse word">vtm</option>
       </select>
       <span id=qa-generate-string-span class=qa-hidden>
-      <label for=qa-generate-string-range>Order:</label>
-      <input type=range id=qa-generate-string-range name=qa-generate-string-range min=0 max=6 value=3 step=1>
-      <span id=qa-generate-string-rank>3</span>
+      <label for=qa-generate-string-range>Length limit:</label>
+      <input type=range id=qa-generate-string-range name=qa-generate-string-range min=1 max=1024 value=168 step=1>
+      <span id=qa-generate-string-rank>16</span>
       </span>
       <button id=qa-tutorial-open-button></button>
     </div>
@@ -2080,7 +2080,7 @@ function update_history_internal() {
   a != counters_default && (t = t.set("counters", a));
   const o = qa_generate_string_list.value;
   o != generate_string_default && (t = t.set("generate_string", o));
-  const s = qa_generate_string_range.value;
+  const s = adjustedLimit(qa_generate_string_range.value);
   s != generate_string_range_default && (t = t.set("generate_string_range", s));
   const c = qa_transform_list.value;
   c != transform_default && (t = t.set("transform", c));
@@ -2134,7 +2134,7 @@ function load_history_internal() {
   const a = $.query.get("generate_string").toString();
   a && (qa_generate_string_list.value = a), a && "custom" != a ? (changeVisibility(qa_generate_string_span, !0), changeVisibility(qa_text, !1)) : (changeVisibility(qa_generate_string_span, !1), changeVisibility(qa_text, !0));
   const o = $.query.get("generate_string_range").toString();
-  o && (qa_generate_string_range.value = o, qa_generate_string_rank.innerHTML = qa_generate_string_range.value);
+  o && (qa_generate_string_range.value = unadjustedLimit(o), qa_generate_string_rank.innerHTML = adjustedLimit(qa_generate_string_range.value));
   const s = $.query.get("transform").toString();
   s && (qa_transform_list.value = s), "custom" == s ? (changeVisibility(qa_transform_input, !0), changeVisibility(qa_transform_active_span, !0)) : (changeVisibility(qa_transform_input, !1), changeVisibility(qa_transform_active_span, !1));
   const c = $.query.get("transform_input").toString();
@@ -2199,8 +2199,48 @@ function transform_text(t) {
   return build_ds(t, structure_flags[e])[e]
 }
 
+function adjustedLimit(limit) {
+  const oldLimit = Math.max(1, Math.min(1024, parseInt(limit) || 168));
+  return Math.ceil(oldLimit / 16 + Math.pow(2, oldLimit / 68.2794)) - 1;
+}
+
+function unadjustedLimit(limit) {
+  const oldLimit = Math.max(1, Math.min(32768, parseInt(limit) || 16));
+  let lo = 1, hi = 1024;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (adjustedLimit(mid) >= oldLimit) hi = mid;
+    else lo = mid + 1;
+  }
+  return lo;
+}
+
 function generate_text() {
-  return "custom" == qa_generate_string_list.value ? qa_text.value : qa_generate_string_list.value in string_generators ? string_generators[qa_generate_string_list.value](parseInt(qa_generate_string_range.value)) : "Unknown string generator: " + qa_generate_string_list.value
+  // The range slider controls a *length limit* (not the morphism order).
+  if ("custom" == qa_generate_string_list.value) return qa_text.value;
+
+  const genName = qa_generate_string_list.value;
+  if (!(genName in string_generators)) return "Unknown string generator: " + genName;
+
+  const limit = adjustedLimit(qa_generate_string_range.value);
+
+  const gen = string_generators[genName];
+
+  // Return the longest word from this family whose length does not exceed the limit.
+  // We increase the order until we would exceed the limit.
+  let best = "";
+  let k = 0;
+
+  // Safety cap: lengths grow quickly; this prevents pathological cases.
+  for (; k < 64; k++) {
+    const cand = gen(k);
+    if (cand.length > limit) break;
+    best = cand;
+  }
+  
+  alert(best.length);
+
+  return best;
 }
 
 function construct_text() {
@@ -2336,7 +2376,7 @@ function update_tutorial(t, e) {
 window.onload = function() {
   qa_tutorial_open_button = document.getElementById("qa-tutorial-open-button"), qa_tutorial_close_button = document.getElementById("qa-tutorial-close-button"), qa_tutorial_overlay = document.getElementById("qa-tutorial-overlay"), qa_tutorial_title = document.getElementById("qa-tutorial-title"), qa_tutorial_content = document.getElementById("qa-tutorial-content"), qa_tutorial_oeis = document.getElementById("qa-tutorial-oeis"), qa_tutorial_cite = document.getElementById("qa-tutorial-cite"), qa_tutorial_wikipedia = document.getElementById("qa-tutorial-wikipedia"), qa_timeout_range = document.getElementById("qa-timeout-range"), qa_timeout_value = document.getElementById("qa-timeout-value"), qa_timeout_range.oninput = () => {
     qa_timeout_value.textContent = qa_timeout_range.value, update_history()
-  }, qa_computation_status = document.getElementById("qa-computation-status"), qa_output_select = document.getElementById("qa-output-select"), qa_counter_itemlists = document.getElementById("qa-counter-itemlists"), qa_counter_automatic = document.getElementById("qa-counter-automatic"), qa_transform_active = document.getElementById("qa-transform-active"), qa_transform_list = document.getElementById("qa-transform-list"), qa_transform_input = document.getElementById("qa-transform-input"), qa_transform_active_span = document.getElementById("qa-transform-active-span"), qa_text = document.getElementById("qa-text"), qa_ds_output = document.getElementById("qa-ds-output"), qa_counter_output = document.getElementById("qa-counter-output"), qa_separator_input = document.getElementById("qa-separator-input"), qa_prepend_input = document.getElementById("qa-prepend-input"), qa_append_input = document.getElementById("qa-append-input"), qa_generate_string_list = document.getElementById("qa-generate-string-list"), qa_generate_string_range = document.getElementById("qa-generate-string-range"), qa_generate_string_rank = document.getElementById("qa-generate-string-rank"), qa_generate_string_span = document.getElementById("qa-generate-string-span"), timeout_default = qa_timeout_range.value, qa_separator_input.value = encodeWhitespaces(separator_default), generate_string_default = qa_generate_string_list.value, generate_string_range_default = qa_generate_string_range.value, transform_default = qa_transform_list.value, prepend_default = qa_prepend_input.value, append_default = qa_append_input.value;
+  }, qa_computation_status = document.getElementById("qa-computation-status"), qa_output_select = document.getElementById("qa-output-select"), qa_counter_itemlists = document.getElementById("qa-counter-itemlists"), qa_counter_automatic = document.getElementById("qa-counter-automatic"), qa_transform_active = document.getElementById("qa-transform-active"), qa_transform_list = document.getElementById("qa-transform-list"), qa_transform_input = document.getElementById("qa-transform-input"), qa_transform_active_span = document.getElementById("qa-transform-active-span"), qa_text = document.getElementById("qa-text"), qa_ds_output = document.getElementById("qa-ds-output"), qa_counter_output = document.getElementById("qa-counter-output"), qa_separator_input = document.getElementById("qa-separator-input"), qa_prepend_input = document.getElementById("qa-prepend-input"), qa_append_input = document.getElementById("qa-append-input"), qa_generate_string_list = document.getElementById("qa-generate-string-list"), qa_generate_string_range = document.getElementById("qa-generate-string-range"), qa_generate_string_rank = document.getElementById("qa-generate-string-rank"), qa_generate_string_span = document.getElementById("qa-generate-string-span"), timeout_default = qa_timeout_range.value, qa_separator_input.value = encodeWhitespaces(separator_default), generate_string_default = qa_generate_string_list.value, generate_string_range_default = adjustedLimit(qa_generate_string_range.value), transform_default = qa_transform_list.value, prepend_default = qa_prepend_input.value, append_default = qa_append_input.value;
   const t = document.getElementById("qa-structures-enabled"),
     e = {
       string: document.getElementById("qa-structures-disabled-string"),
@@ -2377,10 +2417,12 @@ window.onload = function() {
   }), i[t].addEventListener("input", function() {
     updateArrays()
   });
+  
+  
   qa_counter_automatic.addEventListener("change", function() {
     changeVisibility(qa_counter_itemlists, !qa_counter_automatic.checked), updateArrays()
   }), qa_generate_string_range.addEventListener("input", function() {
-    qa_generate_string_rank.innerHTML = qa_generate_string_range.value, updateArrays()
+    qa_generate_string_rank.innerHTML = adjustedLimit(qa_generate_string_range.value), updateArrays()
   }), qa_transform_list.addEventListener("change", function() {
     qa_transform_active.checked = !1, updateArrays()
   }), qa_generate_string_list.addEventListener("change", function() {

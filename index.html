@@ -1061,6 +1061,7 @@ defineStructure({
   deps: [],
   compute: (ctx) => ctx.text
 });
+
 defineStructure({
   id: "index_array",
   displayHtml: "i",
@@ -1072,6 +1073,7 @@ defineStructure({
     return !t || t <= 0 ? [] : Array.from(Array(t).keys())
   }
 });
+
 defineStructure({
   id: "suffix_array",
   displayHtml: "SA",
@@ -1086,6 +1088,7 @@ defineStructure({
     return n.sort((t, e) => t[1].localeCompare(e[1])), n.map(t => t[0])
   }
 });
+
 defineStructure({
   id: "inverse_suffix_array",
   displayHtml: "ISA",
@@ -1094,6 +1097,7 @@ defineStructure({
   deps: ["suffix_array"],
   compute: (ctx, sa) => construct_inverse_suffix_array(sa)
 });
+
 defineStructure({
   id: "border_array",
   displayHtml: "B",
@@ -1114,6 +1118,7 @@ defineStructure({
     return n
   }
 });
+
 defineStructure({
   id: "first_array",
   displayHtml: "F",
@@ -1122,6 +1127,7 @@ defineStructure({
   deps: [],
   compute: (ctx) => construct_first_array(ctx.text)
 });
+
 defineStructure({
   id: "rotation_array",
   displayHtml: "Rot",
@@ -1139,6 +1145,7 @@ defineStructure({
     }), n.map(t => t[0])
   }
 });
+
 defineStructure({
   id: "sl_string",
   displayHtml: "S/L",
@@ -1156,6 +1163,7 @@ defineStructure({
     return "S" == n[0] && (n[0] = "S*"), n
   }
 });
+
 defineStructure({
   id: "invert_transform",
   displayHtml: "Invert",
@@ -1172,6 +1180,7 @@ defineStructure({
     }).join("")
   }
 });
+
 defineStructure({
   id: "revert_transform",
   displayHtml: "Revert",
@@ -1182,6 +1191,7 @@ defineStructure({
     return t ? t.split("").reverse().join("") : ""
   }
 });
+
 defineStructure({
   id: "necklace_conjugate_transform",
   displayHtml: "Necklace Conjugate",
@@ -1189,6 +1199,7 @@ defineStructure({
   deps: [],
   compute: (ctx) => construct_necklace_conjugate_transform(ctx.text)
 });
+
 defineStructure({
   id: "lcp_array",
   displayHtml: "LCP",
@@ -1204,6 +1215,7 @@ defineStructure({
     return n
   }
 });
+
 defineStructure({
   id: "plcp_array",
   displayHtml: "PLCP",
@@ -1222,6 +1234,7 @@ defineStructure({
     return [...new Array(n).keys()].map(n => e[t[n]])
   }
 });
+
 defineStructure({
   id: "substring_complexity",
   displayHtml: "SC",
@@ -1242,6 +1255,7 @@ defineStructure({
     return n
   }
 });
+
 defineStructure({
   id: "bw_transform",
   displayHtml: "BWT",
@@ -1262,6 +1276,7 @@ defineStructure({
     return r
   }
 });
+
 defineStructure({
   id: "lf_array",
   displayHtml: "LF",
@@ -1286,6 +1301,7 @@ defineStructure({
     return r
   }
 });
+
 defineStructure({
   id: "phi_array",
   displayHtml: "Φ",
@@ -1301,6 +1317,7 @@ defineStructure({
     return r
   }
 });
+
 defineStructure({
   id: "inverse_phi_array",
   displayHtml: "Φ⁻¹",
@@ -1317,6 +1334,7 @@ defineStructure({
     return r
   }
 });
+
 defineStructure({
   id: "psi_array",
   displayHtml: "Ψ",
@@ -1331,6 +1349,7 @@ defineStructure({
     return [...new Array(n).keys()].map(r => t[r] + 1 < n ? e[t[r] + 1] : n)
   }
 });
+
 defineStructure({
   id: "odd_maximal_palindromic_length_array",
   displayHtml: "o-pali",
@@ -1352,6 +1371,7 @@ defineStructure({
     return n
   }
 });
+
 defineStructure({
   id: "even_maximal_palindromic_length_array",
   displayHtml: "e-pali",
@@ -1373,6 +1393,7 @@ defineStructure({
     return n
   }
 });
+
 defineStructure({
   id: "lpf_array",
   displayHtml: "LPF",
@@ -1405,6 +1426,7 @@ defineStructure({
     return n
   }
 });
+
 defineStructure({
   id: "lnf_array",
   displayHtml: "LNF",
@@ -1419,6 +1441,7 @@ defineStructure({
     return [...new Array(n).keys()].map(t => e[n - 1 - t])
   }
 });
+
 defineStructure({
   id: "lzss_factorization",
   displayHtml: "LZSS",
@@ -1430,6 +1453,7 @@ defineStructure({
     return greedy_factorize(t)
   }
 });
+
 defineStructure({
   id: "lz77_factorization",
   displayHtml: "LZ77",
@@ -1441,6 +1465,7 @@ defineStructure({
     return greedy_factorize_with_new_letter(t)
   }
 });
+
 defineStructure({
   id: "lzssno_factorization",
   displayHtml: "LZSSno",
@@ -1452,6 +1477,7 @@ defineStructure({
     return greedy_factorize(t)
   }
 });
+
 defineStructure({
   id: "reverse_lzss_factorization",
   displayHtml: "rLZSS",
@@ -1464,6 +1490,7 @@ defineStructure({
     return greedy_factorize(t.slice().reverse())
   }
 });
+
 defineStructure({
   id: "lz78_factorization",
   displayHtml: "LZ78",
@@ -1486,6 +1513,7 @@ defineStructure({
     return n
   }
 });
+
 defineStructure({
   id: "lzw_factorization",
   displayHtml: "LZW",
@@ -1494,6 +1522,7 @@ defineStructure({
   deps: [],
   compute: (ctx) => construct_lzw_factorization(ctx.text)
 });
+
 defineStructure({
   id: "lzend_factorization",
   displayHtml: "LZend",
@@ -1521,6 +1550,7 @@ defineStructure({
     return n
   }
 });
+
 defineStructure({
   id: "gamma_factorization",
   displayHtml: "Γ",
@@ -1574,6 +1604,7 @@ defineStructure({
     return o.forEach(t => s[t] = !0), s
   }
 });
+
 defineStructure({
   id: "lyndon_factorization",
   displayHtml: "LynF",
@@ -1596,6 +1627,7 @@ defineStructure({
     return r[n - 1] = !0, r
   }
 });
+
 defineStructure({
   id: "nss_array",
   displayHtml: "NSS",
@@ -1615,6 +1647,7 @@ defineStructure({
     return n
   }
 });
+
 defineStructure({
   id: "pss_array",
   displayHtml: "PSS",
@@ -1634,6 +1667,7 @@ defineStructure({
     return n
   }
 });
+
 defineStructure({
   id: "lyndon_array",
   displayHtml: "Lyndon",
@@ -1649,6 +1683,7 @@ defineStructure({
     return n
   }
 });
+
 defineStructure({
   id: "necklace_factorization",
   displayHtml: "NeckF",
@@ -1672,6 +1707,7 @@ defineStructure({
     return r
   }
 });
+
 defineStructure({
   id: "circular_suffix_array",
   displayHtml: "CSA",
@@ -1696,6 +1732,7 @@ defineStructure({
     return r.sort((t, e) => omega_order(t.str, e.str)), [...r].map(t => t.pos)
   }
 });
+
 defineStructure({
   id: "inverse_circular_suffix_array",
   displayHtml: "CISA",
@@ -1707,6 +1744,7 @@ defineStructure({
     return t ? construct_inverse_suffix_array(t) : []
   }
 });
+
 defineStructure({
   id: "bbw_indices",
   displayHtml: "BBWTi",
@@ -1729,6 +1767,7 @@ defineStructure({
     })
   }
 });
+
 defineStructure({
   id: "bbw_transform",
   displayHtml: "BBWT",
@@ -1741,6 +1780,7 @@ defineStructure({
     return t && e ? [...e].map(e => t[e]).join("") : ""
   }
 });
+
 defineStructure({
   id: "inverse_bbw_transform",
   displayHtml: "BBWT⁻¹",
@@ -1760,6 +1800,8 @@ defineStructure({
     return greedy_factorize(t)
   }
 });
+
+
 // ---------------- Counter definitions ----------------
 defineCounter({
   id: "sigma",
@@ -1768,6 +1810,7 @@ defineCounter({
   deps: [],
   compute: (ctx) => count_sigma(ctx.text)
 });
+
 defineCounter({
   id: "period",
   displayHtml: "p",
@@ -1775,6 +1818,7 @@ defineCounter({
   deps: ["border_array"],
   compute: (ctx, b) => count_period(b)
 });
+
 defineCounter({
   id: "exponent",
   displayHtml: "e",
@@ -1782,6 +1826,7 @@ defineCounter({
   deps: ["border_array"],
   compute: (ctx, b) => count_exponent(b)
 });
+
 defineCounter({
   id: "regularity",
   displayHtml: "R",
@@ -1789,6 +1834,7 @@ defineCounter({
   deps: ["border_array"],
   compute: (ctx, b) => count_regularity(b)
 });
+
 defineCounter({
   id: "lcp_array",
   displayHtml: "Σ LCP",
@@ -1796,6 +1842,7 @@ defineCounter({
   deps: ["lcp_array"],
   compute: (ctx, lcp) => count_lcp_array(lcp)
 });
+
 defineCounter({
   id: "delta",
   displayHtml: "δ",
@@ -1803,6 +1850,7 @@ defineCounter({
   deps: ["substring_complexity"],
   compute: (ctx, sc) => count_delta(sc)
 });
+
 defineCounter({
   id: "delta_argmax",
   displayHtml: "arg-δ",
@@ -1810,6 +1858,12 @@ defineCounter({
   deps: ["substring_complexity"],
   compute: (ctx, sc) => count_delta_argmax(sc)
 });
+
+// Counter associations
+
+
+
+
 // Automatic counter selection (used by updateArrays() and fill_updates())
 function getEnabledIds(list) {
   const arr = [];

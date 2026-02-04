@@ -1308,25 +1308,17 @@ defineCounterAssociation("substring_complexity", ["delta", "delta_argmax"]);
 
 
 // ---------------- Generator definitions ----------------
-
-function rudin_shapiro_preword(t) {
-  if (t <= 0) return "a";
-  return [...rudin_shapiro_preword(t - 1)].map(t => "a" == t ? "ab" : "b" == t ? "ac" : "c" == t ? "db" : "dc").join("")
-}
-
-
-function baum_sweet_preword(t) {
-  if (t <= 0) return "a";
-  return [...baum_sweet_preword(t - 1)].map(t => "a" == t ? "ab" : "b" == t ? "cb" : "c" == t ? "bd" : "dd").join("")
-}
-
 defineGenerator({
   id: "baum_sweet_word",
   displayHtml: "Baum-Sweet",
   title: "k-th Baum-Sweet Word",
   generate:   function generate_baum_sweet_word(t) {
     if (t <= 0) return "a";
-    return [...baum_sweet_preword(t)].map(t => "c" == t || "d" == t ? "a" : t).join("")
+    const pre = (function preword(k) {
+      if (k <= 0) return "a";
+      return [...preword(k - 1)].map(ch => "a" == ch ? "ab" : "b" == ch ? "cb" : "c" == ch ? "bd" : "dd").join("")
+    })(t);
+    return [...pre].map(ch => "c" == ch || "d" == ch ? "a" : ch).join("")
   }
 });
 
@@ -1399,7 +1391,11 @@ defineGenerator({
   title: "k-th Rudin-Shapiro Word",
   generate:   function generate_rudin_shapiro_word(t) {
     if (t <= 0) return "a";
-    return [...rudin_shapiro_preword(t)].map(t => "a" == t || "b" == t ? "a" : "b").join("")
+    const pre = (function preword(k) {
+      if (k <= 0) return "a";
+      return [...preword(k - 1)].map(ch => "a" == ch ? "ab" : "b" == ch ? "ac" : "c" == ch ? "db" : "dc").join("")
+    })(t);
+    return [...pre].map(ch => "a" == ch || "b" == ch ? "a" : "b").join("")
   }
 });
 

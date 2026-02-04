@@ -781,6 +781,7 @@ function factorization_to_positions(t) {
 const QA_REG = {
   structures: new Map(), // id -> { deps:[], compute(ctx, ...depsVals), ...uiMeta }
   counters: new Map(), // id -> { deps:[], compute(ctx, ...depsVals), ...uiMeta }
+  counterAssociations: new Map(), // structureId -> list of counter Ids
 };
 
 function qa_is_browser() {
@@ -978,6 +979,7 @@ function defineStructure(def) {
         deps: [def.id],
         compute: (ctx, str) => number_of_runs(str)
       });
+      defineCounterAssociation(def.id, def.id);
     } else if (def.type === "factorization") {
       defineCounter({
         id: def.id,
@@ -986,6 +988,7 @@ function defineStructure(def) {
         deps: [def.id],
         compute: (ctx, str) => number_of_runs(str)
       });
+      defineCounterAssociation(def.id, def.id);
     }
   }
 }
@@ -1006,6 +1009,39 @@ function defineCounter(def) {
     if (QA_UI.installed) qa_render_counter(def);
   }
 }
+
+function defineCounterAssociation(structureId, counterIds) {
+  if (!structureId || typeof structureId !== "string") throw new Error("defineCounterAssociation: missing/invalid structureId");
+  let ids = counterIds;
+  if (ids == null) ids = [];
+  if (typeof ids === "string") ids = [ids];
+  if (!Array.isArray(ids)) throw new Error("defineCounterAssociation: counterIds must be an array (or a string)");
+
+  // normalize + dedupe while preserving order
+  const seen = new Set();
+  const norm = [];
+  for (const id of ids) {
+    if (typeof id !== "string" || !id) continue;
+    if (!seen.has(id)) {
+      seen.add(id);
+      norm.push(id);
+    }
+  }
+
+  // Otherwise, treat as "add" (can be called multiple times).
+  const existing = QA_REG.counterAssociations.get(structureId) || [];
+  const merged = existing.slice();
+  const mergedSeen = new Set(existing);
+  for (const id of norm) {
+    if (!mergedSeen.has(id)) {
+      mergedSeen.add(id);
+      merged.push(id);
+    }
+  }
+  QA_REG.counterAssociations.set(structureId, merged);
+}
+
+
 
 function makeBuildContext(text) {
   return {
@@ -1836,7 +1872,7 @@ defineCounter({
 });
 
 defineCounter({
-  id: "lcp_array",
+  id: "sum_of_lcp_array",
   displayHtml: "Σ LCP",
   tooltip: "Sum of entries of LCP",
   deps: ["lcp_array"],
@@ -1860,9 +1896,10 @@ defineCounter({
 });
 
 // Counter associations
-
-
-
+defineCounterAssociation("text", ["text", "sigma"]);
+defineCounterAssociation("border_array", ["period", "exponent", "regularity"]);
+defineCounterAssociation("lcp_array", ["sum_of_lcp_array", "delta", "delta_argmax"]);
+defineCounterAssociation("substring_complexity", ["delta", "delta_argmax"]);
 
 // Automatic counter selection (used by updateArrays() and fill_updates())
 function getEnabledIds(list) {
@@ -1876,22 +1913,9 @@ function getEnabledIds(list) {
 function getAutomaticCounterIds(enabledStructures) {
   const set = new Set();
   for (const sid of enabledStructures) {
-    // Default: if a counter exists with same id, include it
-    if (QA_REG.counters.has(sid)) set.add(sid);
-    // Special: text -> sigma
-    if (sid === "text") set.add("sigma");
-    // Special: border_array -> period/exponent/regularity
-    if (sid === "border_array") {
-      set.add("period");
-      set.add("exponent");
-      set.add("regularity");
-    }
-    // Special: lcp_array -> sum + delta measures
-    if (sid === "lcp_array") {
-      set.add("lcp_array");
-      set.add("delta");
-      set.add("delta_argmax");
-    }
+    const assoc = QA_REG.counterAssociations.get(sid);
+    if (!assoc) continue;
+    for (const cid of assoc) set.add(cid);
   }
   return [...set];
 }

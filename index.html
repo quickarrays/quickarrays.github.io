@@ -530,19 +530,9 @@ function count_regularity(t) {
   return i > 1 && e % r == 0 ? 2 == i ? "square" : "non-primitive" : 0 == n ? "unbordered" : "primitive"
 }
 
-
-
-
-
-
-
 function construct_first_array(t) {
   return t ? [...t].sort().join("") : ""
 }
-
-
-
-
 
 function construct_inverse_suffix_array(t) {
   if (!t) return [];
@@ -550,10 +540,6 @@ function construct_inverse_suffix_array(t) {
   for (let n = 0; n < t.length; n++) e[t[n]] = n;
   return e
 }
-
-
-
-
 
 function lcp_query(t, e, n) {
   if (!t || e < 0 || n < 0 || e >= t.length || n >= t.length) return 0;
@@ -563,17 +549,9 @@ function lcp_query(t, e, n) {
   return r
 }
 
-
-
 function count_lcp_array(t) {
   return t ? t.reduce((t, e) => t + e, 0) : 0
 }
-
-
-
-
-
-
 
 function delta(t) {
   if (0 === t.length) throw new AlgorithmError("Input array 'substring_complexity' cannot be empty.", "delta", {
@@ -595,8 +573,6 @@ function count_delta(t) {
 function count_delta_argmax(t) {
   return t ? delta(t)[0] : 0
 }
-
-
 
 function conjugate_string(t, e) {
   if (!t) return "";
@@ -625,10 +601,6 @@ function rank_query(t, e, n) {
   return [...t.slice(0, n)].filter(t => t === e).length
 }
 
-
-
-
-
 function construct_lpf_array(t) {
   if (!t) return [];
   const e = t.length,
@@ -646,10 +618,6 @@ function construct_lpf_array(t) {
   return n
 }
 
-
-
-
-
 function greedy_factorize(t) {
   if (!t) return [];
   const e = t.length;
@@ -662,10 +630,6 @@ function greedy_factorize(t) {
   }
   return n
 }
-
-
-
-
 
 function greedy_factorize_with_new_letter(t) {
   if (!t) return [];
@@ -680,18 +644,6 @@ function greedy_factorize_with_new_letter(t) {
   return n
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
 function construct_necklace_conjugate_transform(t) {
   if (!t) return "";
   const e = t.length;
@@ -702,10 +654,6 @@ function construct_necklace_conjugate_transform(t) {
   }
   return n
 }
-
-
-
-
 
 function phrases_from_factorizations(t, e) {
   if (!t || !e) return [];
@@ -732,14 +680,6 @@ function omega_order(t, e) {
   }
   return t.length < e.length ? -1 : 1
 }
-
-
-
-
-
-
-
-
 
 function construct_inverse_bbw_transform(t) {
   if (!t) return "";
@@ -773,8 +713,6 @@ function random_ternary_string(t) {
   return e
 }
 
-
-
 function construct_lzw_factorization(t) {
   if (!t) return [];
   const e = t.length,
@@ -803,12 +741,6 @@ function construct_lzw_factorization(t) {
   return n
 }
 
-
-
-
-
-
-
 function get_lzend_reference(t, e, n) {
   let r = 0;
   for (; - 1 !== (r = t.indexOf(e, r));) {
@@ -817,8 +749,6 @@ function get_lzend_reference(t, e, n) {
   }
   return -1
 }
-
-
 
 function is_stringattractor(t, e) {
   const n = t.length,
@@ -842,8 +772,6 @@ function is_stringattractor(t, e) {
   return !0
 }
 
-
-
 function factorization_to_positions(t) {
   const e = [];
   for (let n = 0; n < t.length; n++) t[n] && e.push(n);
@@ -852,13 +780,12 @@ function factorization_to_positions(t) {
 // ---------------- Registry (Path B) ----------------
 const QA_REG = {
   structures: new Map(), // id -> { deps:[], compute(ctx, ...depsVals), ...uiMeta }
-  counters: new Map(),   // id -> { deps:[], compute(ctx, ...depsVals), ...uiMeta }
+  counters: new Map(), // id -> { deps:[], compute(ctx, ...depsVals), ...uiMeta }
 };
 
 function qa_is_browser() {
   return typeof document !== "undefined" && typeof window !== "undefined";
 }
-
 const QA_UI = {
   installed: false,
   structuresEnabled: null,
@@ -867,7 +794,6 @@ const QA_UI = {
   countersDisabled: null,
   transformList: null,
 };
-
 const QA_STRUCTURE_TYPE_CLASS = {
   string: "qa-structure-string",
   index: "qa-structure-index",
@@ -884,7 +810,6 @@ function qa_make_item(kind, def) {
     el.className = "qa-item qa-counter qa-item qa-counter";
   }
   el.dataset.ds = def.id;
-
   // symbolHtml is optional; fallback to existing mapping if present; else id
   let sym = def.displayHtml || def.symbolHtml;
   if (!sym && kind === "structure" && typeof globalThis.ds_name2html === "object" && globalThis.ds_name2html && globalThis.ds_name2html[def.id]) {
@@ -894,9 +819,7 @@ function qa_make_item(kind, def) {
     sym = globalThis.counter_name2html[def.id];
   }
   if (!sym) sym = def.id;
-
   el.innerHTML = sym;
-
   const tooltip = def.tooltip || (def.tutorial && def.tutorial.title) || "";
   if (tooltip) {
     const tt = document.createElement("span");
@@ -910,7 +833,6 @@ function qa_make_item(kind, def) {
 function qa_install_ui_if_possible() {
   if (!qa_is_browser()) return;
   if (QA_UI.installed) return;
-
   QA_UI.structuresEnabled = document.getElementById("qa-structures-enabled");
   QA_UI.structuresDisabled = {
     string: document.getElementById("qa-structures-disabled-string"),
@@ -921,12 +843,9 @@ function qa_install_ui_if_possible() {
   QA_UI.countersEnabled = document.getElementById("qa-counter-enabled");
   QA_UI.countersDisabled = document.getElementById("qa-counter-disabled");
   QA_UI.transformList = document.getElementById("qa-transform-list");
-
   // Mark installed even if some containers are missing (prevents repeated lookups)
   QA_UI.installed = true;
-
   qa_rebuild_transform_list();
-
   // Render anything already defined
   for (const def of QA_REG.structures.values()) qa_render_structure(def);
   for (const def of QA_REG.counters.values()) qa_render_counter(def);
@@ -934,17 +853,13 @@ function qa_install_ui_if_possible() {
 
 function qa_render_structure(def) {
   if (!qa_is_browser() || !QA_UI.installed) return;
-
   // transform option rendering
   qa_render_transform_option(def);
-
   // structure element rendering
   if (!qa_should_render_as_structure(def)) return;
   if (def._el) return;
-
   const t = def.type;
   if (!t || !QA_UI.structuresDisabled[t]) throw new Error("Structure '" + def.id + "' missing/invalid type (string|index|length|factorization)");
-
   def._el = qa_make_item("structure", def);
   const parent = def.enabledByDefault ? QA_UI.structuresEnabled : QA_UI.structuresDisabled[t];
   if (parent) parent.appendChild(def._el);
@@ -953,7 +868,6 @@ function qa_render_structure(def) {
 function qa_render_counter(def) {
   if (!qa_is_browser() || !QA_UI.installed) return;
   if (def._el) return;
-
   def._el = qa_make_item("counter", def);
   const parent = def.enabledByDefault ? QA_UI.countersEnabled : QA_UI.countersDisabled;
   if (parent) parent.appendChild(def._el);
@@ -986,14 +900,12 @@ function qa_render_transform_option(def) {
   if (!QA_UI.transformList) return;
   if (!qa_should_render_as_transform(def)) return;
   if (def._opt) return;
-
   const opt = document.createElement("option");
   opt.value = def.id;
   if (def.tooltip) opt.title = def.tooltip;
   // prefer transformDisplayHtml if provided, else displayHtml
   opt.innerHTML = def.transformDisplayHtml || def.displayHtml || def.id;
   def._opt = opt;
-
   // Insert before "custom" option if present; else append
   const custom = QA_UI.transformList.querySelector('option[value="custom"]');
   if (custom && custom.parentElement === QA_UI.transformList) {
@@ -1005,19 +917,15 @@ function qa_render_transform_option(def) {
 
 function qa_rebuild_transform_list() {
   if (!qa_is_browser() || !QA_UI.installed || !QA_UI.transformList) return;
-
   const sel = QA_UI.transformList;
   const prev = sel.value;
-
   // Clear all options
   while (sel.firstChild) sel.removeChild(sel.firstChild);
-
   // None
   const none = document.createElement("option");
   none.value = "none";
   none.textContent = "None";
   sel.appendChild(none);
-
   // Add transforms in definition order
   for (const def of QA_REG.structures.values()) {
     if (!qa_should_render_as_transform(def)) continue;
@@ -1028,37 +936,30 @@ function qa_rebuild_transform_list() {
     def._opt = opt;
     sel.appendChild(opt);
   }
-
   // Custom
   const custom = document.createElement("option");
   custom.value = "custom";
   custom.textContent = "Custom";
   sel.appendChild(custom);
-
   // Restore previous selection if still valid
   const still = sel.querySelector('option[value="' + prev + '"]');
   sel.value = still ? prev : "none";
 }
 
-
 function defineStructure(def) {
   if (!def || !def.id) throw new Error("defineStructure: missing id");
   if (QA_REG.structures.has(def.id)) throw new Error("defineStructure: duplicate " + def.id);
-
   // Back-compat: if tutorials[id] exists, auto-attach it unless overridden
   if (def.tutorial === undefined && typeof globalThis.tutorials === "object" && globalThis.tutorials && globalThis.tutorials[def.id]) {
     def.tutorial = globalThis.tutorials[def.id];
   }
-
   def.deps = def.deps || [];
   QA_REG.structures.set(def.id, def);
-
   // register tutorial for update_tutorial()
   if (def.tutorial) {
     if (typeof globalThis.tutorials !== "object" || !globalThis.tutorials) globalThis.tutorials = {};
     globalThis.tutorials[def.id] = def.tutorial;
   }
-
   // create/render DOM element if running in browser
   if (qa_is_browser()) {
     if (QA_UI.installed) qa_render_structure(def);
@@ -1068,19 +969,15 @@ function defineStructure(def) {
 function defineCounter(def) {
   if (!def || !def.id) throw new Error("defineCounter: missing id");
   if (QA_REG.counters.has(def.id)) throw new Error("defineCounter: duplicate " + def.id);
-
   if (def.tutorial === undefined && typeof globalThis.tutorials === "object" && globalThis.tutorials && globalThis.tutorials[def.id]) {
     def.tutorial = globalThis.tutorials[def.id];
   }
-
   def.deps = def.deps || [];
   QA_REG.counters.set(def.id, def);
-
   if (def.tutorial) {
     if (typeof globalThis.tutorials !== "object" || !globalThis.tutorials) globalThis.tutorials = {};
     globalThis.tutorials[def.id] = def.tutorial;
   }
-
   if (qa_is_browser()) {
     if (QA_UI.installed) qa_render_counter(def);
   }
@@ -1091,26 +988,20 @@ function makeBuildContext(text) {
     text,
     _s: new Map(),
     _c: new Map(),
-
     getStructure(id) {
       if (id === "text") return this.text; // special structure
       if (this._s.has(id)) return this._s.get(id);
-
       const def = QA_REG.structures.get(id);
       if (!def) throw new Error("Unknown structure: " + id);
-
       const depVals = def.deps.map(d => this.getStructure(d));
       const val = def.compute(this, ...depVals);
       this._s.set(id, val);
       return val;
     },
-
     getCounter(id) {
       if (this._c.has(id)) return this._c.get(id);
-
       const def = QA_REG.counters.get(id);
       if (!def) return undefined; // allow UI to show "not defined" for legacy counters
-
       const depVals = def.deps.map(d => this.getStructure(d)); // counter deps are structures
       const val = def.compute(this, ...depVals);
       this._c.set(id, val);
@@ -1118,551 +1009,913 @@ function makeBuildContext(text) {
     },
   };
 }
-
 // New build_ds signature:
 // request = { structures: string[], counters: string[] }
 function build_ds(text, request) {
   const req = request || {};
   const structures = Array.isArray(req.structures) ? req.structures : [];
   const counters = Array.isArray(req.counters) ? req.counters : [];
-
   const ctx = makeBuildContext(text);
   const out = {};
-
   // Structures
   for (const id of structures) {
     out[id] = ctx.getStructure(id);
   }
-
   // Counters => output key must stay "counter_<id>" because fill_updates expects that
   for (const id of counters) {
     const v = ctx.getCounter(id);
     if (v !== undefined) out["counter_" + id] = v;
   }
-
   return out;
 }
-
 // ---------------- Structure definitions ----------------
-defineStructure({ id: "text", displayHtml: "T", type: "string", stringtype: "structure-only", deps: [], compute: (ctx) => ctx.text });
-
-defineStructure({ id: "index_array", displayHtml: "i", tooltip: "Index Array", type: "index", deps: [], compute: (ctx) => {
+defineStructure({
+  id: "text",
+  displayHtml: "T",
+  type: "string",
+  stringtype: "structure-only",
+  deps: [],
+  compute: (ctx) => ctx.text
+});
+defineStructure({
+  id: "index_array",
+  displayHtml: "i",
+  tooltip: "Index Array",
+  type: "index",
+  deps: [],
+  compute: (ctx) => {
     const t = ctx.text.length;
-
-  return !t || t <= 0 ? [] : Array.from(Array(t).keys())
-  } });
-defineStructure({ id: "suffix_array", displayHtml: "SA", tooltip: "Suffix Array", type: "index", deps: [], compute: (ctx) => {
-    const t = ctx.text;
-
-  if (!t) return [];
-  const e = t.length,
-    n = [...Array(e).keys()].map(e => [e, t.substring(e)]);
-  return n.sort((t, e) => t[1].localeCompare(e[1])), n.map(t => t[0])
-  } });
-defineStructure({ id: "inverse_suffix_array", displayHtml: "ISA", tooltip: "Inverse Suffix Array", type: "index", deps: ["suffix_array"], compute: (ctx, sa) => construct_inverse_suffix_array(sa) });
-defineStructure({ id: "border_array", displayHtml: "B", tooltip: "Border Array", type: "length", deps: [], compute: (ctx) => {
-    const t = ctx.text;
-
-  if (!t) return [];
-  const e = t.length,
-    n = new Array(e);
-  n[0] = 0;
-  for (let r = 1; r < e; r++) {
-    let e = n[r - 1];
-    for (; e > 0 && t[r] !== t[e];) e = n[e - 1];
-    t[r] === t[e] && e++, n[r] = e
+    return !t || t <= 0 ? [] : Array.from(Array(t).keys())
   }
-  return n
-  } });
-defineStructure({ id: "first_array", displayHtml: "F", tooltip: "First Column Array", type: "string", deps: [], compute: (ctx) => construct_first_array(ctx.text) });
-defineStructure({ id: "rotation_array", displayHtml: "Rot", tooltip: "Rotation Array", type: "index", deps: [], compute: (ctx) => {
+});
+defineStructure({
+  id: "suffix_array",
+  displayHtml: "SA",
+  tooltip: "Suffix Array",
+  type: "index",
+  deps: [],
+  compute: (ctx) => {
     const t = ctx.text;
-
-  if (!t) return [];
-  const e = t.length,
-    n = [...Array(e).keys()].map(e => [e, conjugate_string(t, e)]);
-  return n.sort((t, e) => {
-    const n = t[1].localeCompare(e[1]);
-    return 0 !== n ? n : t[0] - e[0]
-  }), n.map(t => t[0])
-  } });
-defineStructure({ id: "sl_string", displayHtml: "S/L", tooltip: "S/L SAIS type string", type: "length", deps: [], compute: (ctx) => {
+    if (!t) return [];
+    const e = t.length,
+      n = [...Array(e).keys()].map(e => [e, t.substring(e)]);
+    return n.sort((t, e) => t[1].localeCompare(e[1])), n.map(t => t[0])
+  }
+});
+defineStructure({
+  id: "inverse_suffix_array",
+  displayHtml: "ISA",
+  tooltip: "Inverse Suffix Array",
+  type: "index",
+  deps: ["suffix_array"],
+  compute: (ctx, sa) => construct_inverse_suffix_array(sa)
+});
+defineStructure({
+  id: "border_array",
+  displayHtml: "B",
+  tooltip: "Border Array",
+  type: "length",
+  deps: [],
+  compute: (ctx) => {
     const t = ctx.text;
-
-  if (!t) return [];
-  const e = t.length,
-    n = new Array(e);
-  let r = "S";
-  n[e - 1] = r;
-  for (let i = e - 2; i >= 0; --i) t[i + 1] > t[i] ? r = "S" : t[i + 1] < t[i] && (r = "L", "S" == n[i + 1] && (n[i + 1] = "S*")), n[i] = r;
-  return "S" == n[0] && (n[0] = "S*"), n
-  } });
-
-defineStructure({ id: "invert_transform", displayHtml: "Invert", type: "string", deps: [], compute: (ctx) => {
+    if (!t) return [];
+    const e = t.length,
+      n = new Array(e);
+    n[0] = 0;
+    for (let r = 1; r < e; r++) {
+      let e = n[r - 1];
+      for (; e > 0 && t[r] !== t[e];) e = n[e - 1];
+      t[r] === t[e] && e++, n[r] = e
+    }
+    return n
+  }
+});
+defineStructure({
+  id: "first_array",
+  displayHtml: "F",
+  tooltip: "First Column Array",
+  type: "string",
+  deps: [],
+  compute: (ctx) => construct_first_array(ctx.text)
+});
+defineStructure({
+  id: "rotation_array",
+  displayHtml: "Rot",
+  tooltip: "Rotation Array",
+  type: "index",
+  deps: [],
+  compute: (ctx) => {
     const t = ctx.text;
-
-  if (!t) return "";
-  const e = [...t].sort(),
-    n = e[0],
-    r = e.reverse()[0];
-  return [...t].map(function(t) {
-    return String.fromCharCode(r.charCodeAt(0) - (t.charCodeAt(0) - n.charCodeAt(0)))
-  }).join("")
-  } });
-defineStructure({ id: "revert_transform", displayHtml: "Revert", type: "string", deps: [], compute: (ctx) => {
+    if (!t) return [];
+    const e = t.length,
+      n = [...Array(e).keys()].map(e => [e, conjugate_string(t, e)]);
+    return n.sort((t, e) => {
+      const n = t[1].localeCompare(e[1]);
+      return 0 !== n ? n : t[0] - e[0]
+    }), n.map(t => t[0])
+  }
+});
+defineStructure({
+  id: "sl_string",
+  displayHtml: "S/L",
+  tooltip: "S/L SAIS type string",
+  type: "length",
+  deps: [],
+  compute: (ctx) => {
     const t = ctx.text;
-
-  return t ? t.split("").reverse().join("") : ""
-  } });
-defineStructure({ id: "necklace_conjugate_transform", displayHtml: "Necklace Conjugate", type: "string", deps: [], compute: (ctx) => construct_necklace_conjugate_transform(ctx.text) });
-
-defineStructure({ id: "lcp_array", displayHtml: "LCP", tooltip: "Longest Common Prefix array", type: "length", deps: ["suffix_array"], compute: (ctx, sa) => {
+    if (!t) return [];
+    const e = t.length,
+      n = new Array(e);
+    let r = "S";
+    n[e - 1] = r;
+    for (let i = e - 2; i >= 0; --i) t[i + 1] > t[i] ? r = "S" : t[i + 1] < t[i] && (r = "L", "S" == n[i + 1] && (n[i + 1] = "S*")), n[i] = r;
+    return "S" == n[0] && (n[0] = "S*"), n
+  }
+});
+defineStructure({
+  id: "invert_transform",
+  displayHtml: "Invert",
+  type: "string",
+  deps: [],
+  compute: (ctx) => {
+    const t = ctx.text;
+    if (!t) return "";
+    const e = [...t].sort(),
+      n = e[0],
+      r = e.reverse()[0];
+    return [...t].map(function(t) {
+      return String.fromCharCode(r.charCodeAt(0) - (t.charCodeAt(0) - n.charCodeAt(0)))
+    }).join("")
+  }
+});
+defineStructure({
+  id: "revert_transform",
+  displayHtml: "Revert",
+  type: "string",
+  deps: [],
+  compute: (ctx) => {
+    const t = ctx.text;
+    return t ? t.split("").reverse().join("") : ""
+  }
+});
+defineStructure({
+  id: "necklace_conjugate_transform",
+  displayHtml: "Necklace Conjugate",
+  type: "string",
+  deps: [],
+  compute: (ctx) => construct_necklace_conjugate_transform(ctx.text)
+});
+defineStructure({
+  id: "lcp_array",
+  displayHtml: "LCP",
+  tooltip: "Longest Common Prefix array",
+  type: "length",
+  deps: ["suffix_array"],
+  compute: (ctx, sa) => {
     const t = ctx.text;
     const e = sa;
-
-  if (!t || !e) return [];
-  const n = [0];
-  for (let r = 1; r < e.length; r++) n.push(lcp_query(t, e[r], e[r - 1]));
-  return n
-  } });
-defineStructure({ id: "plcp_array", displayHtml: "PLCP", tooltip: "Permuted Longest Common Prefix array", type: "length", deps: ["inverse_suffix_array", "lcp_array"], compute: (ctx, isa, lcp) => {
+    if (!t || !e) return [];
+    const n = [0];
+    for (let r = 1; r < e.length; r++) n.push(lcp_query(t, e[r], e[r - 1]));
+    return n
+  }
+});
+defineStructure({
+  id: "plcp_array",
+  displayHtml: "PLCP",
+  tooltip: "Permuted Longest Common Prefix array",
+  type: "length",
+  deps: ["inverse_suffix_array", "lcp_array"],
+  compute: (ctx, isa, lcp) => {
     const t = isa;
     const e = lcp;
-
-  if (!t || !e) return [];
-  if (t.length !== e.length) throw new AlgorithmError("Inverse suffix array and LCP array must have the same length.", "PLCP", {
-    inverse_suffix_array: t,
-    lcp_array: e
-  });
-  const n = t.length;
-  return [...new Array(n).keys()].map(n => e[t[n]])
-  } });
-defineStructure({ id: "substring_complexity", displayHtml: "SC", tooltip: "Substring Complexity Array", type: "length", deps: ["lcp_array"], compute: (ctx, lcp) => {
+    if (!t || !e) return [];
+    if (t.length !== e.length) throw new AlgorithmError("Inverse suffix array and LCP array must have the same length.", "PLCP", {
+      inverse_suffix_array: t,
+      lcp_array: e
+    });
+    const n = t.length;
+    return [...new Array(n).keys()].map(n => e[t[n]])
+  }
+});
+defineStructure({
+  id: "substring_complexity",
+  displayHtml: "SC",
+  tooltip: "Substring Complexity Array",
+  type: "length",
+  deps: ["lcp_array"],
+  compute: (ctx, lcp) => {
     const t = lcp;
-
-  if (!t) return [];
-  const e = t.length,
-    n = new Array(e),
-    r = new Map;
-  t.forEach(t => {
-    r.set(t, (r.get(t) || 0) + 1)
-  });
-  let i = 0;
-  for (let t = e; t >= 1; --t) i += 1, r.has(t) && (i -= r.get(t)), n[t - 1] = i;
-  return n
-  } });
-
-defineStructure({ id: "bw_transform", displayHtml: "BWT", tooltip: "Burrows-Wheeler Transform", type: "string", deps: ["rotation_array"], compute: (ctx, rot) => {
+    if (!t) return [];
+    const e = t.length,
+      n = new Array(e),
+      r = new Map;
+    t.forEach(t => {
+      r.set(t, (r.get(t) || 0) + 1)
+    });
+    let i = 0;
+    for (let t = e; t >= 1; --t) i += 1, r.has(t) && (i -= r.get(t)), n[t - 1] = i;
+    return n
+  }
+});
+defineStructure({
+  id: "bw_transform",
+  displayHtml: "BWT",
+  tooltip: "Burrows-Wheeler Transform",
+  type: "string",
+  deps: ["rotation_array"],
+  compute: (ctx, rot) => {
     const t = ctx.text;
     const e = rot;
-
-  if (!t) return "";
-  if (t.length !== e.length) throw new AlgorithmError("Invalid input: text must be a string and rotation_array must be an array", "BWT", {
-    text: t,
-    rotation_array: e
-  });
-  const n = t.length;
-  let r = "";
-  for (let i = 0; i < n; i++) r += t[(e[i] + n - 1) % n];
-  return r
-  } });
-defineStructure({ id: "lf_array", displayHtml: "LF", tooltip: "Last-to-First Mapping Array", type: "index", deps: ["first_array", "bw_transform"], compute: (ctx, first, bwt) => {
+    if (!t) return "";
+    if (t.length !== e.length) throw new AlgorithmError("Invalid input: text must be a string and rotation_array must be an array", "BWT", {
+      text: t,
+      rotation_array: e
+    });
+    const n = t.length;
+    let r = "";
+    for (let i = 0; i < n; i++) r += t[(e[i] + n - 1) % n];
+    return r
+  }
+});
+defineStructure({
+  id: "lf_array",
+  displayHtml: "LF",
+  tooltip: "Last-to-First Mapping Array",
+  type: "index",
+  deps: ["first_array", "bw_transform"],
+  compute: (ctx, first, bwt) => {
     const t = first;
     const e = bwt;
-
-  if (!t || !e) return [];
-  if (t.length !== e.length) throw new AlgorithmError("First array and BWT must have the same length.", "LF", {
-    first_array: t,
-    bw_transform: e
-  });
-  const n = t.length,
-    r = new Array(n);
-  for (let i = 0; i < n; ++i) {
-    const n = e[i],
-      a = rank_query(e, n, i + 1);
-    r[i] = select_query(t, n, a)
-  }
-  return r
-  } });
-
-defineStructure({ id: "phi_array", displayHtml: "Φ", tooltip: "Phi Array", type: "index", deps: ["suffix_array", "inverse_suffix_array"], compute: (ctx, sa, isa) => {
-    const t = sa;
-    const e = isa;
-
-  const n = t.length,
-    r = new Array(n);
-  for (let i = 0; i < n; i++) 0 !== e[i] ? r[i] = t[e[i] - 1] : r[i] = n;
-  return r
-  } });
-defineStructure({ id: "inverse_phi_array", displayHtml: "Φ⁻¹", tooltip: "Inverse Phi Array", type: "index", deps: ["suffix_array", "inverse_suffix_array"], compute: (ctx, sa, isa) => {
-    const t = sa;
-    const e = isa;
-
-  if (!t || !e) return [];
-  const n = t.length,
-    r = new Array(n);
-  for (let i = 0; i < n; ++i) e[i] + 1 !== n ? r[i] = t[e[i] + 1] : r[i] = n;
-  return r
-  } });
-defineStructure({ id: "psi_array", displayHtml: "Ψ", tooltip: "Psi Array", type: "index", deps: ["suffix_array", "inverse_suffix_array"], compute: (ctx, sa, isa) => {
-    const t = sa;
-    const e = isa;
-
-  if (!t || !e) return [];
-  const n = t.length;
-  return [...new Array(n).keys()].map(r => t[r] + 1 < n ? e[t[r] + 1] : n)
-  } });
-
-defineStructure({ id: "odd_maximal_palindromic_length_array", displayHtml: "o-pali", tooltip: "Odd Maximal Palindromic Length Array", type: "length", deps: [], compute: (ctx) => {
-    const t = ctx.text;
-
-  if (!t) return [];
-  const e = t.length,
-    n = new Array(e).fill(0);
-  let r = 0,
-    i = 0;
-  for (let a = 0; a < e; a++) {
-    let o = 2 * r - a;
-    for (a < i && (n[a] = Math.min(i - a, n[o])); a - n[a] - 1 >= 0 && a + n[a] + 1 < e && t[a - n[a] - 1] === t[a + n[a] + 1];) n[a]++;
-    a + n[a] > i && (r = a, i = a + n[a])
-  }
-  return n
-  } });
-defineStructure({ id: "even_maximal_palindromic_length_array", displayHtml: "e-pali", tooltip: "Even Maximal Palindromic Length Array", type: "length", deps: [], compute: (ctx) => {
-    const t = ctx.text;
-
-  if (!t) return [];
-  const e = t.length,
-    n = new Array(e).fill(0);
-  let r = 0,
-    i = 0;
-  for (let a = 0; a < e; a++) {
-    let o = 2 * r - a + 1;
-    for (a < i && (n[a] = Math.min(i - a, n[o])); a - n[a] - 1 >= 0 && a + n[a] < e && t[a - n[a] - 1] === t[a + n[a]];) n[a]++;
-    a + n[a] > i && (r = a - 1, i = a + n[a])
-  }
-  return n
-  } });
-
-defineStructure({ id: "lpf_array", displayHtml: "LPF", tooltip: "Longest Previous Factor array", type: "length", deps: [], compute: (ctx) => construct_lpf_array(ctx.text) });
-defineStructure({ id: "lpnf_array", displayHtml: "LPnF", tooltip: "Longest Previous Non-Overlapping Factor array", type: "length", deps: [], compute: (ctx) => {
-    const t = ctx.text;
-
-  if (!t) return [];
-  const e = t.length,
-    n = new Array(e);
-  n[0] = 0;
-  for (let r = 1; r < e; r++) {
-    let i = 0;
-    for (let n = 0; n < r; n++) {
-      let a = 0;
-      for (; r + a < e && n + a < r && t[r + a] === t[n + a];) a++;
-      i = Math.max(i, a)
-    }
-    n[r] = i
-  }
-  return n
-  } });
-defineStructure({ id: "lnf_array", displayHtml: "LNF", tooltip: "Longest Next Factor array", type: "length", deps: [], compute: (ctx) => {
-    const t = ctx.text;
-
-  if (!t) return [];
-  const e = construct_lpf_array(t.split("").reverse().join("")),
-    n = e.length;
-  return [...new Array(n).keys()].map(t => e[n - 1 - t])
-  } });
-
-defineStructure({ id: "lzss_factorization", displayHtml: "LZSS", tooltip: "LZSS Factorization", type: "factorization", deps: ["lpf_array"], compute: (ctx, lpf) => {
-    const t = lpf;
-
-  return greedy_factorize(t)
-  } });
-defineStructure({ id: "lz77_factorization", displayHtml: "LZ77", tooltip: "LZ77 Factorization", type: "factorization", deps: ["lpf_array"], compute: (ctx, lpf) => {
-    const t = lpf;
-
-  return greedy_factorize_with_new_letter(t)
-  } });
-defineStructure({ id: "lzssno_factorization", displayHtml: "LZSSno", tooltip: "LZSS non-overlapping Factorization", type: "factorization", deps: ["lpnf_array"], compute: (ctx, lpnf) => {
-    const t = lpnf;
-
-  return greedy_factorize(t)
-  } });
-defineStructure({ id: "reverse_lzss_factorization", displayHtml: "rLZSS", tooltip: "Reverse LZSS Factorization", type: "factorization", deps: ["lnf_array"], compute: (ctx, lnf) => {
-    const t = lnf;
-
-  if (!t) return [];
-  return greedy_factorize(t.slice().reverse())
-  } });
-
-defineStructure({ id: "lz78_factorization", displayHtml: "LZ78", tooltip: "LZ78 Factorization", type: "factorization", deps: [], compute: (ctx) => {
-    const t = ctx.text;
-
-  if (!t) return [];
-  const e = t.length,
-    n = new Array(e).fill(!1),
-    r = new Map;
-  let i = 0;
-  for (; i < e;) {
-    let a = "";
-    for (let n = i; n < e && (a += t[n], r.has(a)); n++);
-    const o = a;
-    r.set(o, i), n[i + o.length - 1] = !0, i += o.length
-  }
-  return n
-  } });
-defineStructure({ id: "lzw_factorization", displayHtml: "LZW", tooltip: "LZW Factorization", type: "factorization", deps: [], compute: (ctx) => construct_lzw_factorization(ctx.text) });
-defineStructure({ id: "lzend_factorization", displayHtml: "LZend", tooltip: "LZ-end Factorization", type: "factorization", deps: [], compute: (ctx) => {
-    const t = ctx.text;
-
-  if (!t) return [];
-  const e = t.length,
-    n = new Array(e).fill(!1);
-  for (let r = 0; r < e;) {
-    let i = "",
-      a = "";
-    const o = t.slice(0, r);
-    for (let s = r; s < e && (a += t[s], -1 !== o.indexOf(a)); s++) - 1 !== get_lzend_reference(o, a, n) && (i = a);
-    i ? i += t[r + i.length - 1] : i = t[r];
-    let s = r + i.length - 1;
-    if (s >= e) {
-      n[e - 1] = !0;
-      break
-    }
-    n[s] = !0, r = s + 1
-  }
-  return n
-  } });
-defineStructure({ id: "gamma_factorization", displayHtml: "Γ", tooltip: "Leftmost Smallest String Attractor", type: "factorization", deps: [], compute: (ctx) => {
-    const t = ctx.text;
-
-  if (!t) return [];
-  const e = t.length,
-    n = new Map;
-  for (let r = 0; r < e; r++) {
-    let i = "";
-    for (let a = r; a < e; a++) i += t[a], n.set(i, (n.get(i) || 0) + 1)
-  }
-  const r = [];
-  for (const [t, e] of n.entries()) {
-    let i = !0;
-    for (let r = 0; r < t.length && i; r++) {
-      const a = t.slice(0, r) + t.slice(r + 1);
-      a.length > 0 && n.get(a) <= e && (i = !1)
-    }
-    i && r.push(t)
-  }
-  const i = r.map(n => {
-      const r = new Set;
-      for (let i = 0; i + n.length <= e; i++)
-        if (t.slice(i, i + n.length) === n)
-          for (let t = i; t < i + n.length; t++) r.add(t);
-      return r
-    }),
-    a = [...Array(e).keys()];
-  const o = function t(e, n, r) {
-      if (r.size > 0 && n.size >= r.size) return new Set;
-      let o = !0;
-      for (const t of i) {
-        let e = !1;
-        for (const r of n)
-          if (t.has(r)) {
-            e = !0;
-            break
-          } if (!e) {
-          o = !1;
-          break
-        }
-      }
-      return o ? new Set(n) : e === a.length ? new Set : (n.add(a[e]), r = (s = t(e + 1, n, r)).size > 0 ? s : r, n.delete(a[e]), r = (s = t(e + 1, n, r)).size > 0 ? s : r);
-      var s
-    }(0, new Set, new Set),
-    s = new Array(e).fill(!1);
-  return o.forEach(t => s[t] = !0), s
-  } });
-
-defineStructure({ id: "lyndon_factorization", displayHtml: "LynF", tooltip: "Lyndon Factorization", type: "factorization", deps: ["inverse_suffix_array"], compute: (ctx, isa) => {
-    const t = ctx.text;
-    const e = isa;
-
-  if (!t || !e) return [];
-  const n = t.length;
-  if (0 === n) return [];
-  const r = new Array(n).fill(!1);
-  if (e.length < n) throw new AlgorithmError(`Inverse suffix array (inverse_suffix_array) must have a length of at least text.length (${n}), but got ${e.length}.`, "LynF", {
-    text: t,
-    inverse_suffix_array: e
-  });
-  let i = e[0];
-  for (let t = 0; t + 1 < n; ++t) i > e[t + 1] && (r[t] = !0, i = e[t + 1]);
-  return r[n - 1] = !0, r
-  } });
-
-defineStructure({ id: "nss_array", displayHtml: "NSS", tooltip: "Next Smaller Suffix Array", type: "index", deps: ["inverse_suffix_array"], compute: (ctx, isa) => {
-    const t = isa;
-
-  if (!t) return [];
-  const e = t.length,
-    n = new Array(e);
-  for (let r = 0; r < e; ++r) {
-    let i = r + 1;
-    for (; i < e && t[i] > t[r];) ++i;
-    n[r] = i >= e ? e : i
-  }
-  return n
-  } });
-defineStructure({ id: "pss_array", displayHtml: "PSS", tooltip: "Previous Smaller Suffix Array", type: "index", deps: ["inverse_suffix_array"], compute: (ctx, isa) => {
-    const t = isa;
-
-  if (!t) return [];
-  const e = t.length,
-    n = new Array(e);
-  for (let r = 0; r < e; ++r) {
-    let i = r - 1;
-    for (; i >= 0 && t[i] > t[r];) --i;
-    n[r] = i < 0 ? e : i
-  }
-  return n
-  } });
-defineStructure({ id: "lyndon_array", displayHtml: "Lyndon", tooltip: "Lyndon Array", type: "length", deps: ["nss_array"], compute: (ctx, nss) => {
-    const t = nss;
-
-  if (!t) return [];
-  const e = t.length;
-  let n = new Array(e);
-  for (let r = 0; r < e; ++r) n[r] = t[r] === e ? e - r : t[r] - r;
-  return n
-  } });
-
-defineStructure({ id: "necklace_factorization", displayHtml: "NeckF", tooltip: "Necklace Factorization", type: "factorization", deps: ["lyndon_factorization"], compute: (ctx, lynF) => {
-    const t = ctx.text;
-    const e = lynF;
-
-  if (!t || !e) return [];
-  const n = t.length,
-    r = new Array(n).fill(!1);
-  let i = 0,
-    a = "";
-  for (; i < n;) {
-    let o = i;
-    for (; o < n && 0 == e[o];) o++;
-    const s = t.slice(i, o + 1);
-    s !== a ? (a = s, r[o] = !0, i = o + 1) : (r[i - 1] = !1, r[o] = !0, i = o + 1)
-  }
-  return r
-  } });
-
-defineStructure({ id: "circular_suffix_array", displayHtml: "CSA", tooltip: "Circular Suffix Array", type: "index", deps: ["lyndon_factorization"], compute: (ctx, lynF) => {
-    const t = ctx.text;
-    const e = lynF;
-
-  if (!t || !e) return [];
-  const n = phrases_from_factorizations(t, e),
-    r = [];
-  let i = 0;
-  for (const t of n) {
-    const e = t.length;
-    for (let n = 0; n < e; ++n) r.push({
-      pos: i + n,
-      str: conjugate_string(t, n)
+    if (!t || !e) return [];
+    if (t.length !== e.length) throw new AlgorithmError("First array and BWT must have the same length.", "LF", {
+      first_array: t,
+      bw_transform: e
     });
-    i += e
+    const n = t.length,
+      r = new Array(n);
+    for (let i = 0; i < n; ++i) {
+      const n = e[i],
+        a = rank_query(e, n, i + 1);
+      r[i] = select_query(t, n, a)
+    }
+    return r
   }
-  return r.sort((t, e) => omega_order(t.str, e.str)), [...r].map(t => t.pos)
-  } });
-defineStructure({ id: "inverse_circular_suffix_array", displayHtml: "CISA", tooltip: "Inverse Circular Suffix Array", type: "index", deps: ["circular_suffix_array"], compute: (ctx, csa) => {
+});
+defineStructure({
+  id: "phi_array",
+  displayHtml: "Φ",
+  tooltip: "Phi Array",
+  type: "index",
+  deps: ["suffix_array", "inverse_suffix_array"],
+  compute: (ctx, sa, isa) => {
+    const t = sa;
+    const e = isa;
+    const n = t.length,
+      r = new Array(n);
+    for (let i = 0; i < n; i++) 0 !== e[i] ? r[i] = t[e[i] - 1] : r[i] = n;
+    return r
+  }
+});
+defineStructure({
+  id: "inverse_phi_array",
+  displayHtml: "Φ⁻¹",
+  tooltip: "Inverse Phi Array",
+  type: "index",
+  deps: ["suffix_array", "inverse_suffix_array"],
+  compute: (ctx, sa, isa) => {
+    const t = sa;
+    const e = isa;
+    if (!t || !e) return [];
+    const n = t.length,
+      r = new Array(n);
+    for (let i = 0; i < n; ++i) e[i] + 1 !== n ? r[i] = t[e[i] + 1] : r[i] = n;
+    return r
+  }
+});
+defineStructure({
+  id: "psi_array",
+  displayHtml: "Ψ",
+  tooltip: "Psi Array",
+  type: "index",
+  deps: ["suffix_array", "inverse_suffix_array"],
+  compute: (ctx, sa, isa) => {
+    const t = sa;
+    const e = isa;
+    if (!t || !e) return [];
+    const n = t.length;
+    return [...new Array(n).keys()].map(r => t[r] + 1 < n ? e[t[r] + 1] : n)
+  }
+});
+defineStructure({
+  id: "odd_maximal_palindromic_length_array",
+  displayHtml: "o-pali",
+  tooltip: "Odd Maximal Palindromic Length Array",
+  type: "length",
+  deps: [],
+  compute: (ctx) => {
+    const t = ctx.text;
+    if (!t) return [];
+    const e = t.length,
+      n = new Array(e).fill(0);
+    let r = 0,
+      i = 0;
+    for (let a = 0; a < e; a++) {
+      let o = 2 * r - a;
+      for (a < i && (n[a] = Math.min(i - a, n[o])); a - n[a] - 1 >= 0 && a + n[a] + 1 < e && t[a - n[a] - 1] === t[a + n[a] + 1];) n[a]++;
+      a + n[a] > i && (r = a, i = a + n[a])
+    }
+    return n
+  }
+});
+defineStructure({
+  id: "even_maximal_palindromic_length_array",
+  displayHtml: "e-pali",
+  tooltip: "Even Maximal Palindromic Length Array",
+  type: "length",
+  deps: [],
+  compute: (ctx) => {
+    const t = ctx.text;
+    if (!t) return [];
+    const e = t.length,
+      n = new Array(e).fill(0);
+    let r = 0,
+      i = 0;
+    for (let a = 0; a < e; a++) {
+      let o = 2 * r - a + 1;
+      for (a < i && (n[a] = Math.min(i - a, n[o])); a - n[a] - 1 >= 0 && a + n[a] < e && t[a - n[a] - 1] === t[a + n[a]];) n[a]++;
+      a + n[a] > i && (r = a - 1, i = a + n[a])
+    }
+    return n
+  }
+});
+defineStructure({
+  id: "lpf_array",
+  displayHtml: "LPF",
+  tooltip: "Longest Previous Factor array",
+  type: "length",
+  deps: [],
+  compute: (ctx) => construct_lpf_array(ctx.text)
+});
+defineStructure({
+  id: "lpnf_array",
+  displayHtml: "LPnF",
+  tooltip: "Longest Previous Non-Overlapping Factor array",
+  type: "length",
+  deps: [],
+  compute: (ctx) => {
+    const t = ctx.text;
+    if (!t) return [];
+    const e = t.length,
+      n = new Array(e);
+    n[0] = 0;
+    for (let r = 1; r < e; r++) {
+      let i = 0;
+      for (let n = 0; n < r; n++) {
+        let a = 0;
+        for (; r + a < e && n + a < r && t[r + a] === t[n + a];) a++;
+        i = Math.max(i, a)
+      }
+      n[r] = i
+    }
+    return n
+  }
+});
+defineStructure({
+  id: "lnf_array",
+  displayHtml: "LNF",
+  tooltip: "Longest Next Factor array",
+  type: "length",
+  deps: [],
+  compute: (ctx) => {
+    const t = ctx.text;
+    if (!t) return [];
+    const e = construct_lpf_array(t.split("").reverse().join("")),
+      n = e.length;
+    return [...new Array(n).keys()].map(t => e[n - 1 - t])
+  }
+});
+defineStructure({
+  id: "lzss_factorization",
+  displayHtml: "LZSS",
+  tooltip: "LZSS Factorization",
+  type: "factorization",
+  deps: ["lpf_array"],
+  compute: (ctx, lpf) => {
+    const t = lpf;
+    return greedy_factorize(t)
+  }
+});
+defineStructure({
+  id: "lz77_factorization",
+  displayHtml: "LZ77",
+  tooltip: "LZ77 Factorization",
+  type: "factorization",
+  deps: ["lpf_array"],
+  compute: (ctx, lpf) => {
+    const t = lpf;
+    return greedy_factorize_with_new_letter(t)
+  }
+});
+defineStructure({
+  id: "lzssno_factorization",
+  displayHtml: "LZSSno",
+  tooltip: "LZSS non-overlapping Factorization",
+  type: "factorization",
+  deps: ["lpnf_array"],
+  compute: (ctx, lpnf) => {
+    const t = lpnf;
+    return greedy_factorize(t)
+  }
+});
+defineStructure({
+  id: "reverse_lzss_factorization",
+  displayHtml: "rLZSS",
+  tooltip: "Reverse LZSS Factorization",
+  type: "factorization",
+  deps: ["lnf_array"],
+  compute: (ctx, lnf) => {
+    const t = lnf;
+    if (!t) return [];
+    return greedy_factorize(t.slice().reverse())
+  }
+});
+defineStructure({
+  id: "lz78_factorization",
+  displayHtml: "LZ78",
+  tooltip: "LZ78 Factorization",
+  type: "factorization",
+  deps: [],
+  compute: (ctx) => {
+    const t = ctx.text;
+    if (!t) return [];
+    const e = t.length,
+      n = new Array(e).fill(!1),
+      r = new Map;
+    let i = 0;
+    for (; i < e;) {
+      let a = "";
+      for (let n = i; n < e && (a += t[n], r.has(a)); n++);
+      const o = a;
+      r.set(o, i), n[i + o.length - 1] = !0, i += o.length
+    }
+    return n
+  }
+});
+defineStructure({
+  id: "lzw_factorization",
+  displayHtml: "LZW",
+  tooltip: "LZW Factorization",
+  type: "factorization",
+  deps: [],
+  compute: (ctx) => construct_lzw_factorization(ctx.text)
+});
+defineStructure({
+  id: "lzend_factorization",
+  displayHtml: "LZend",
+  tooltip: "LZ-end Factorization",
+  type: "factorization",
+  deps: [],
+  compute: (ctx) => {
+    const t = ctx.text;
+    if (!t) return [];
+    const e = t.length,
+      n = new Array(e).fill(!1);
+    for (let r = 0; r < e;) {
+      let i = "",
+        a = "";
+      const o = t.slice(0, r);
+      for (let s = r; s < e && (a += t[s], -1 !== o.indexOf(a)); s++) - 1 !== get_lzend_reference(o, a, n) && (i = a);
+      i ? i += t[r + i.length - 1] : i = t[r];
+      let s = r + i.length - 1;
+      if (s >= e) {
+        n[e - 1] = !0;
+        break
+      }
+      n[s] = !0, r = s + 1
+    }
+    return n
+  }
+});
+defineStructure({
+  id: "gamma_factorization",
+  displayHtml: "Γ",
+  tooltip: "Leftmost Smallest String Attractor",
+  type: "factorization",
+  deps: [],
+  compute: (ctx) => {
+    const t = ctx.text;
+    if (!t) return [];
+    const e = t.length,
+      n = new Map;
+    for (let r = 0; r < e; r++) {
+      let i = "";
+      for (let a = r; a < e; a++) i += t[a], n.set(i, (n.get(i) || 0) + 1)
+    }
+    const r = [];
+    for (const [t, e] of n.entries()) {
+      let i = !0;
+      for (let r = 0; r < t.length && i; r++) {
+        const a = t.slice(0, r) + t.slice(r + 1);
+        a.length > 0 && n.get(a) <= e && (i = !1)
+      }
+      i && r.push(t)
+    }
+    const i = r.map(n => {
+        const r = new Set;
+        for (let i = 0; i + n.length <= e; i++)
+          if (t.slice(i, i + n.length) === n)
+            for (let t = i; t < i + n.length; t++) r.add(t);
+        return r
+      }),
+      a = [...Array(e).keys()];
+    const o = function t(e, n, r) {
+        if (r.size > 0 && n.size >= r.size) return new Set;
+        let o = !0;
+        for (const t of i) {
+          let e = !1;
+          for (const r of n)
+            if (t.has(r)) {
+              e = !0;
+              break
+            } if (!e) {
+            o = !1;
+            break
+          }
+        }
+        return o ? new Set(n) : e === a.length ? new Set : (n.add(a[e]), r = (s = t(e + 1, n, r)).size > 0 ? s : r, n.delete(a[e]), r = (s = t(e + 1, n, r)).size > 0 ? s : r);
+        var s
+      }(0, new Set, new Set),
+      s = new Array(e).fill(!1);
+    return o.forEach(t => s[t] = !0), s
+  }
+});
+defineStructure({
+  id: "lyndon_factorization",
+  displayHtml: "LynF",
+  tooltip: "Lyndon Factorization",
+  type: "factorization",
+  deps: ["inverse_suffix_array"],
+  compute: (ctx, isa) => {
+    const t = ctx.text;
+    const e = isa;
+    if (!t || !e) return [];
+    const n = t.length;
+    if (0 === n) return [];
+    const r = new Array(n).fill(!1);
+    if (e.length < n) throw new AlgorithmError(`Inverse suffix array (inverse_suffix_array) must have a length of at least text.length (${n}), but got ${e.length}.`, "LynF", {
+      text: t,
+      inverse_suffix_array: e
+    });
+    let i = e[0];
+    for (let t = 0; t + 1 < n; ++t) i > e[t + 1] && (r[t] = !0, i = e[t + 1]);
+    return r[n - 1] = !0, r
+  }
+});
+defineStructure({
+  id: "nss_array",
+  displayHtml: "NSS",
+  tooltip: "Next Smaller Suffix Array",
+  type: "index",
+  deps: ["inverse_suffix_array"],
+  compute: (ctx, isa) => {
+    const t = isa;
+    if (!t) return [];
+    const e = t.length,
+      n = new Array(e);
+    for (let r = 0; r < e; ++r) {
+      let i = r + 1;
+      for (; i < e && t[i] > t[r];) ++i;
+      n[r] = i >= e ? e : i
+    }
+    return n
+  }
+});
+defineStructure({
+  id: "pss_array",
+  displayHtml: "PSS",
+  tooltip: "Previous Smaller Suffix Array",
+  type: "index",
+  deps: ["inverse_suffix_array"],
+  compute: (ctx, isa) => {
+    const t = isa;
+    if (!t) return [];
+    const e = t.length,
+      n = new Array(e);
+    for (let r = 0; r < e; ++r) {
+      let i = r - 1;
+      for (; i >= 0 && t[i] > t[r];) --i;
+      n[r] = i < 0 ? e : i
+    }
+    return n
+  }
+});
+defineStructure({
+  id: "lyndon_array",
+  displayHtml: "Lyndon",
+  tooltip: "Lyndon Array",
+  type: "length",
+  deps: ["nss_array"],
+  compute: (ctx, nss) => {
+    const t = nss;
+    if (!t) return [];
+    const e = t.length;
+    let n = new Array(e);
+    for (let r = 0; r < e; ++r) n[r] = t[r] === e ? e - r : t[r] - r;
+    return n
+  }
+});
+defineStructure({
+  id: "necklace_factorization",
+  displayHtml: "NeckF",
+  tooltip: "Necklace Factorization",
+  type: "factorization",
+  deps: ["lyndon_factorization"],
+  compute: (ctx, lynF) => {
+    const t = ctx.text;
+    const e = lynF;
+    if (!t || !e) return [];
+    const n = t.length,
+      r = new Array(n).fill(!1);
+    let i = 0,
+      a = "";
+    for (; i < n;) {
+      let o = i;
+      for (; o < n && 0 == e[o];) o++;
+      const s = t.slice(i, o + 1);
+      s !== a ? (a = s, r[o] = !0, i = o + 1) : (r[i - 1] = !1, r[o] = !0, i = o + 1)
+    }
+    return r
+  }
+});
+defineStructure({
+  id: "circular_suffix_array",
+  displayHtml: "CSA",
+  tooltip: "Circular Suffix Array",
+  type: "index",
+  deps: ["lyndon_factorization"],
+  compute: (ctx, lynF) => {
+    const t = ctx.text;
+    const e = lynF;
+    if (!t || !e) return [];
+    const n = phrases_from_factorizations(t, e),
+      r = [];
+    let i = 0;
+    for (const t of n) {
+      const e = t.length;
+      for (let n = 0; n < e; ++n) r.push({
+        pos: i + n,
+        str: conjugate_string(t, n)
+      });
+      i += e
+    }
+    return r.sort((t, e) => omega_order(t.str, e.str)), [...r].map(t => t.pos)
+  }
+});
+defineStructure({
+  id: "inverse_circular_suffix_array",
+  displayHtml: "CISA",
+  tooltip: "Inverse Circular Suffix Array",
+  type: "index",
+  deps: ["circular_suffix_array"],
+  compute: (ctx, csa) => {
     const t = csa;
-
-  return t ? construct_inverse_suffix_array(t) : []
-  } });
-
-defineStructure({ id: "bbw_indices", displayHtml: "BBWTi", tooltip: "Text-Indices of the Bijective Burrows-Wheeler Transform", type: "index", deps: ["lyndon_factorization", "circular_suffix_array"], compute: (ctx, lynF, csa) => {
+    return t ? construct_inverse_suffix_array(t) : []
+  }
+});
+defineStructure({
+  id: "bbw_indices",
+  displayHtml: "BBWTi",
+  tooltip: "Text-Indices of the Bijective Burrows-Wheeler Transform",
+  type: "index",
+  deps: ["lyndon_factorization", "circular_suffix_array"],
+  compute: (ctx, lynF, csa) => {
     const t = lynF;
     const e = csa;
-
-  if (!t || !e) return [];
-  const n = e.length;
-  return [...e].map(e => {
-    var r;
-    if (0 == e || 1 == t[e - 1]) {
-      const i = rank_query(t, !0, e),
-        a = select_query(t, !0, 1 + i);
-      r = -1 == a ? n - 1 : a
-    } else r = e - 1;
-    return r
-  })
-  } });
-defineStructure({ id: "bbw_transform", displayHtml: "BBWT", tooltip: "Bijective Burrows-Wheeler Transform", type: "string", deps: ["bbw_indices"], compute: (ctx, idx) => {
+    if (!t || !e) return [];
+    const n = e.length;
+    return [...e].map(e => {
+      var r;
+      if (0 == e || 1 == t[e - 1]) {
+        const i = rank_query(t, !0, e),
+          a = select_query(t, !0, 1 + i);
+        r = -1 == a ? n - 1 : a
+      } else r = e - 1;
+      return r
+    })
+  }
+});
+defineStructure({
+  id: "bbw_transform",
+  displayHtml: "BBWT",
+  tooltip: "Bijective Burrows-Wheeler Transform",
+  type: "string",
+  deps: ["bbw_indices"],
+  compute: (ctx, idx) => {
     const t = ctx.text;
     const e = idx;
-
-  return t && e ? [...e].map(e => t[e]).join("") : ""
-  } });
-defineStructure({ id: "inverse_bbw_transform", displayHtml: "BBWT⁻¹", tooltip: "Inverse Bijective Burrows-Wheeler Transform", type: "string", deps: ["bbw_transform"], compute: (ctx, bbwt) => construct_inverse_bbw_transform(bbwt) });
-
-defineStructure({ id: "lexparse_factorization", displayHtml: "LexParse", tooltip: "Lexicographic Parse Factorization", type: "factorization", deps: ["plcp_array"], compute: (ctx, plcp) => {
+    return t && e ? [...e].map(e => t[e]).join("") : ""
+  }
+});
+defineStructure({
+  id: "inverse_bbw_transform",
+  displayHtml: "BBWT⁻¹",
+  tooltip: "Inverse Bijective Burrows-Wheeler Transform",
+  type: "string",
+  deps: ["bbw_transform"],
+  compute: (ctx, bbwt) => construct_inverse_bbw_transform(bbwt)
+});
+defineStructure({
+  id: "lexparse_factorization",
+  displayHtml: "LexParse",
+  tooltip: "Lexicographic Parse Factorization",
+  type: "factorization",
+  deps: ["plcp_array"],
+  compute: (ctx, plcp) => {
     const t = plcp;
-
-  return greedy_factorize(t)
-  } });
-
+    return greedy_factorize(t)
+  }
+});
 // ---------------- Counter definitions ----------------
-defineCounter({ id: "text", displayHtml: "T", deps: [], compute: (ctx) => number_of_runs(ctx.text) });
-defineCounter({ id: "sigma", displayHtml: "σ", deps: [], compute: (ctx) => count_sigma(ctx.text) });
-
-defineCounter({ id: "period", displayHtml: "p", deps: ["border_array"], compute: (ctx, b) => count_period(b) });
-defineCounter({ id: "exponent", displayHtml: "e", deps: ["border_array"], compute: (ctx, b) => count_exponent(b) });
-defineCounter({ id: "regularity", displayHtml: "R", deps: ["border_array"], compute: (ctx, b) => count_regularity(b) });
-
-defineCounter({ id: "lcp_array", displayHtml: "Σ LCP", deps: ["lcp_array"], compute: (ctx, lcp) => count_lcp_array(lcp) });
-
-defineCounter({ id: "delta", displayHtml: "δ", deps: ["substring_complexity"], compute: (ctx, sc) => count_delta(sc) });
-defineCounter({ id: "delta_argmax", displayHtml: "max δ", deps: ["substring_complexity"], compute: (ctx, sc) => count_delta_argmax(sc) });
-
-defineCounter({ id: "bw_transform", displayHtml: "BWT", deps: ["bw_transform"], compute: (ctx, bwt) => number_of_runs(bwt) });
-defineCounter({ id: "bbw_transform", displayHtml: "BBWT", deps: ["bbw_transform"], compute: (ctx, bbwt) => number_of_runs(bbwt) });
-defineCounter({ id: "inverse_bbw_transform", displayHtml: "BBWT⁻¹", deps: ["inverse_bbw_transform"], compute: (ctx, s) => number_of_runs(s) });
-
-defineCounter({ id: "gamma_factorization", displayHtml: "Γ", deps: ["gamma_factorization"], compute: (ctx, f) => number_of_factors(f) });
-defineCounter({ id: "lz78_factorization", displayHtml: "LZ78", deps: ["lz78_factorization"], compute: (ctx, f) => number_of_factors(f) });
-defineCounter({ id: "lzw_factorization", displayHtml: "LZW", deps: ["lzw_factorization"], compute: (ctx, f) => number_of_factors(f) });
-defineCounter({ id: "lzend_factorization", displayHtml: "LZend", deps: ["lzend_factorization"], compute: (ctx, f) => number_of_factors(f) });
-defineCounter({ id: "lzss_factorization", displayHtml: "LZSS", deps: ["lzss_factorization"], compute: (ctx, f) => number_of_factors(f) });
-defineCounter({ id: "lz77_factorization", displayHtml: "LZ77", deps: ["lz77_factorization"], compute: (ctx, f) => number_of_factors(f) });
-defineCounter({ id: "lzssno_factorization", displayHtml: "LZSSno", deps: ["lzssno_factorization"], compute: (ctx, f) => number_of_factors(f) });
-defineCounter({ id: "reverse_lzss_factorization", displayHtml: "rLZSS", deps: ["reverse_lzss_factorization"], compute: (ctx, f) => number_of_factors(f) });
-
-defineCounter({ id: "lexparse_factorization", displayHtml: "LexParse", deps: ["lexparse_factorization"], compute: (ctx, f) => number_of_factors(f) });
-defineCounter({ id: "lyndon_factorization", displayHtml: "LynF", deps: ["lyndon_factorization"], compute: (ctx, f) => number_of_factors(f) });
-defineCounter({ id: "necklace_factorization", displayHtml: "NeckF", deps: ["necklace_factorization"], compute: (ctx, f) => number_of_factors(f) });
-
-defineCounter({ id: "invert_transform", displayHtml: "invert_transform", deps: ["invert_transform"], compute: (ctx, s) => number_of_runs(s) });
-defineCounter({ id: "revert_transform", displayHtml: "revert_transform", deps: ["revert_transform"], compute: (ctx, s) => number_of_runs(s) });
-defineCounter({ id: "necklace_conjugate_transform", displayHtml: "necklace_conjugate_transform", deps: ["necklace_conjugate_transform"], compute: (ctx, s) => number_of_runs(s) });
-
+defineCounter({
+  id: "text",
+  displayHtml: "T",
+  deps: [],
+  compute: (ctx) => number_of_runs(ctx.text)
+});
+defineCounter({
+  id: "sigma",
+  displayHtml: "σ",
+  deps: [],
+  compute: (ctx) => count_sigma(ctx.text)
+});
+defineCounter({
+  id: "period",
+  displayHtml: "p",
+  deps: ["border_array"],
+  compute: (ctx, b) => count_period(b)
+});
+defineCounter({
+  id: "exponent",
+  displayHtml: "e",
+  deps: ["border_array"],
+  compute: (ctx, b) => count_exponent(b)
+});
+defineCounter({
+  id: "regularity",
+  displayHtml: "R",
+  deps: ["border_array"],
+  compute: (ctx, b) => count_regularity(b)
+});
+defineCounter({
+  id: "lcp_array",
+  displayHtml: "Σ LCP",
+  deps: ["lcp_array"],
+  compute: (ctx, lcp) => count_lcp_array(lcp)
+});
+defineCounter({
+  id: "delta",
+  displayHtml: "δ",
+  deps: ["substring_complexity"],
+  compute: (ctx, sc) => count_delta(sc)
+});
+defineCounter({
+  id: "delta_argmax",
+  displayHtml: "max δ",
+  deps: ["substring_complexity"],
+  compute: (ctx, sc) => count_delta_argmax(sc)
+});
+defineCounter({
+  id: "bw_transform",
+  displayHtml: "BWT",
+  deps: ["bw_transform"],
+  compute: (ctx, bwt) => number_of_runs(bwt)
+});
+defineCounter({
+  id: "bbw_transform",
+  displayHtml: "BBWT",
+  deps: ["bbw_transform"],
+  compute: (ctx, bbwt) => number_of_runs(bbwt)
+});
+defineCounter({
+  id: "inverse_bbw_transform",
+  displayHtml: "BBWT⁻¹",
+  deps: ["inverse_bbw_transform"],
+  compute: (ctx, s) => number_of_runs(s)
+});
+defineCounter({
+  id: "gamma_factorization",
+  displayHtml: "Γ",
+  deps: ["gamma_factorization"],
+  compute: (ctx, f) => number_of_factors(f)
+});
+defineCounter({
+  id: "lz78_factorization",
+  displayHtml: "LZ78",
+  deps: ["lz78_factorization"],
+  compute: (ctx, f) => number_of_factors(f)
+});
+defineCounter({
+  id: "lzw_factorization",
+  displayHtml: "LZW",
+  deps: ["lzw_factorization"],
+  compute: (ctx, f) => number_of_factors(f)
+});
+defineCounter({
+  id: "lzend_factorization",
+  displayHtml: "LZend",
+  deps: ["lzend_factorization"],
+  compute: (ctx, f) => number_of_factors(f)
+});
+defineCounter({
+  id: "lzss_factorization",
+  displayHtml: "LZSS",
+  deps: ["lzss_factorization"],
+  compute: (ctx, f) => number_of_factors(f)
+});
+defineCounter({
+  id: "lz77_factorization",
+  displayHtml: "LZ77",
+  deps: ["lz77_factorization"],
+  compute: (ctx, f) => number_of_factors(f)
+});
+defineCounter({
+  id: "lzssno_factorization",
+  displayHtml: "LZSSno",
+  deps: ["lzssno_factorization"],
+  compute: (ctx, f) => number_of_factors(f)
+});
+defineCounter({
+  id: "reverse_lzss_factorization",
+  displayHtml: "rLZSS",
+  deps: ["reverse_lzss_factorization"],
+  compute: (ctx, f) => number_of_factors(f)
+});
+defineCounter({
+  id: "lexparse_factorization",
+  displayHtml: "LexParse",
+  deps: ["lexparse_factorization"],
+  compute: (ctx, f) => number_of_factors(f)
+});
+defineCounter({
+  id: "lyndon_factorization",
+  displayHtml: "LynF",
+  deps: ["lyndon_factorization"],
+  compute: (ctx, f) => number_of_factors(f)
+});
+defineCounter({
+  id: "necklace_factorization",
+  displayHtml: "NeckF",
+  deps: ["necklace_factorization"],
+  compute: (ctx, f) => number_of_factors(f)
+});
+defineCounter({
+  id: "invert_transform",
+  displayHtml: "invert_transform",
+  deps: ["invert_transform"],
+  compute: (ctx, s) => number_of_runs(s)
+});
+defineCounter({
+  id: "revert_transform",
+  displayHtml: "revert_transform",
+  deps: ["revert_transform"],
+  compute: (ctx, s) => number_of_runs(s)
+});
+defineCounter({
+  id: "necklace_conjugate_transform",
+  displayHtml: "necklace_conjugate_transform",
+  deps: ["necklace_conjugate_transform"],
+  compute: (ctx, s) => number_of_runs(s)
+});
 // Automatic counter selection (used by updateArrays() and fill_updates())
 function getEnabledIds(list) {
   const arr = [];
-  list.forEachEnabled(function(id) { arr.push(id); });
+  list.forEachEnabled(function(id) {
+    arr.push(id);
+  });
   return arr;
 }
 
 function getAutomaticCounterIds(enabledStructures) {
   const set = new Set();
-
   for (const sid of enabledStructures) {
     // Default: if a counter exists with same id, include it
     if (QA_REG.counters.has(sid)) set.add(sid);
-
     // Special: text -> sigma
     if (sid === "text") set.add("sigma");
-
     // Special: border_array -> period/exponent/regularity
-    if (sid === "border_array") { set.add("period"); set.add("exponent"); set.add("regularity"); }
-
+    if (sid === "border_array") {
+      set.add("period");
+      set.add("exponent");
+      set.add("regularity");
+    }
     // Special: lcp_array -> sum + delta measures
-    if (sid === "lcp_array") { set.add("lcp_array"); set.add("delta"); set.add("delta_argmax"); }
+    if (sid === "lcp_array") {
+      set.add("lcp_array");
+      set.add("delta");
+      set.add("delta_argmax");
+    }
   }
-
   return [...set];
 }
 
@@ -1739,8 +1992,6 @@ function generate_kolakoski_word(t) {
   for (let t = 0; t < e.length; ++t) n += t % 2 == 0 ? "a" == e[t] ? "a" : "aa" : "a" == e[t] ? "b" : "bb";
   return n
 }
-
-
 const citations = {};
 citations.allouche03automatic = 'Jean-Paul Allouche and Jeffrey Shallit. <em><a href="https://doi.org/10.1017/CBO9780511546563">Automatic sequences: Theory, applications, generalizations</a></em>. Cambridge University Press, 2003.', citations.manber93sa = 'Udi Manber and Eugene W. Myers. <a href="https://doi.org/10.1137/0222058">Suffix arrays: <span>A</span> new method for on-line string searches</a>. <em><span>SIAM</span> J. Comput.</em>, 22(5):935–948, 1993.', citations.burrows94bwt = "Michael Burrows and David J. Wheeler. A block sorting lossless data compression algorithm. Technical report, 124, Digital Equipment Corporation, Palo Alto, California, 1994.", citations.burrows94bwt = "Michael Burrows and David J. Wheeler. A block sorting lossless data compression algorithm. Technical report, 124, Digital Equipment Corporation, Palo Alto, California, 1994.", citations.manber93sa = 'Udi Manber and Eugene W. Myers. <a href="https://doi.org/10.1137/0222058">Suffix arrays: <span>A</span> new method for on-line string searches</a>. <em><span>SIAM</span> J. Comput.</em>, 22(5):935–948, 1993.', citations.karkkainen09plcp = 'Juha Kärkkäinen, Giovanni Manzini, and Simon J. Puglisi. <a href="https://doi.org/10.1007/978-3-642-02441-2_17">Permuted longest-common-prefix array</a>. In <em>Proc. CPM</em>, volume 5577, pages 181–192. 2009.', citations.karkkainen09plcp = 'Juha Kärkkäinen, Giovanni Manzini, and Simon J. Puglisi. <a href="https://doi.org/10.1007/978-3-642-02441-2_17">Permuted longest-common-prefix array</a>. In <em>Proc. CPM</em>, volume 5577, pages 181–192. 2009.', citations.grossi05csa = 'Roberto Grossi and Jeffrey Scott Vitter. <a href="https://doi.org/10.1137/S0097539702402354">Compressed suffix arrays and suffix trees with applications to text indexing and string matching</a>. <em><span>SIAM</span> J. Comput.</em>, 35(2):378–407, 2005.', citations.chen58lyndon = "Kuo Tsai Chen, Ralph H. Fox, and Roger C. Lyndon. Free differential calculus, <span>IV</span>. <span>T</span>he quotient groups of the lower central series. <em>Annals of Mathematics</em>, 68(1):81–95, 1958.", citations.raskhodnikova13sublinear = 'Sofya Raskhodnikova, Dana Ron, Ronitt Rubinfeld, and Adam D. Smith. <a href="https://doi.org/10.1007/s00453-012-9618-6">Sublinear algorithms for approximating string compressibility</a>. <em>Algorithmica</em>, 65(3):685–709, 2013.', citations.raskhodnikova13sublinear = 'Sofya Raskhodnikova, Dana Ron, Ronitt Rubinfeld, and Adam D. Smith. <a href="https://doi.org/10.1007/s00453-012-9618-6">Sublinear algorithms for approximating string compressibility</a>. <em>Algorithmica</em>, 65(3):685–709, 2013.', citations.raskhodnikova13sublinear = 'Sofya Raskhodnikova, Dana Ron, Ronitt Rubinfeld, and Adam D. Smith. <a href="https://doi.org/10.1007/s00453-012-9618-6">Sublinear algorithms for approximating string compressibility</a>. <em>Algorithmica</em>, 65(3):685–709, 2013.', citations.burrows94bwt = "Michael Burrows and David J. Wheeler. A block sorting lossless data compression algorithm. Technical report, 124, Digital Equipment Corporation, Palo Alto, California, 1994.", citations.nong11sais = 'Ge Nong, Sen Zhang, and Wai Hong Chan. <a href="https://doi.org/10.1109/TC.2010.188">Two efficient algorithms for linear time suffix array construction</a>. <em><span>IEEE</span> Trans. Computers</em>, 60(10):1471–1484, 2011.', citations.storer82lzss = 'James A. Storer and Thomas G. Szymanski. <a href="https://doi.org/10.1145/322344.322346">Data compression via textural substitution</a>. <em>J. <span>ACM</span></em>, 29(4):928–951, 1982.', citations.storer82lzss = 'James A. Storer and Thomas G. Szymanski. <a href="https://doi.org/10.1145/322344.322346">Data compression via textural substitution</a>. <em>J. <span>ACM</span></em>, 29(4):928–951, 1982.', citations.ziv77lz = 'Jacob Ziv and Abraham Lempel. <a href="https://doi.org/10.1109/TIT.1977.1055714">A universal algorithm for sequential data compression</a>. <em><span>IEEE</span> Trans. Information Theory</em>, 23(3):337–343, 1977.', citations.storer82lzss = 'James A. Storer and Thomas G. Szymanski. <a href="https://doi.org/10.1145/322344.322346">Data compression via textural substitution</a>. <em>J. <span>ACM</span></em>, 29(4):928–951, 1982.', citations.navarro21approximation = 'Gonzalo Navarro, Carlos Ochoa, and Nicola Prezza. <a href="https://doi.org/10.1109/TIT.2020.3042746">On the approximation ratio of ordered parsings</a>. <em><span>IEEE</span> Trans. Inf. Theory</em>, 67(2):1008–1026, 2021.', citations.franek16algorithms = "Frantisek Franek, A. S. M. Sohidull Islam, Mohammad Sohel Rahman, and William F. Smyth. Algorithms to compute the <span>Lyndon</span> array. In <em>Proc. PSC</em>, pages 172–184. 2016.", citations.hon13spaceefficient = 'Wing-Kai Hon, Tsung-Han Ku, Rahul Shah, and Sharma V. Thankachan. <a href="https://doi.org/10.1007/978-3-642-38905-4\\_15">Space-efficient construction algorithm for the circular suffix tree</a>. In <em>Proc. CPM</em>, volume 7922, pages 142–152. 2013.', citations.hon13spaceefficient = 'Wing-Kai Hon, Tsung-Han Ku, Rahul Shah, and Sharma V. Thankachan. <a href="https://doi.org/10.1007/978-3-642-38905-4\\_15">Space-efficient construction algorithm for the circular suffix tree</a>. In <em>Proc. CPM</em>, volume 7922, pages 142–152. 2013.', citations.bannai25survey = 'Hideo Bannai, Dominik Köppl, and Zsuzsanna Lipták. <a href="https://doi.org/10.4230/OASIcs.Manzini.2">A survey of the bijective <span>Burrows</span>–<span>Wheeler</span> transform</a>. In <em>The expanding world of compressed data: A festschrift for <span>Giovanni</span> <span>Manzini</span>’s 60th birthday</em>, volume 131, pages 2:1–2:26. 2025.', citations.bannai25survey = 'Hideo Bannai, Dominik Köppl, and Zsuzsanna Lipták. <a href="https://doi.org/10.4230/OASIcs.Manzini.2">A survey of the bijective <span>Burrows</span>–<span>Wheeler</span> transform</a>. In <em>The expanding world of compressed data: A festschrift for <span>Giovanni</span> <span>Manzini</span>’s 60th birthday</em>, volume 131, pages 2:1–2:26. 2025.', citations.bannai25survey = 'Hideo Bannai, Dominik Köppl, and Zsuzsanna Lipták. <a href="https://doi.org/10.4230/OASIcs.Manzini.2">A survey of the bijective <span>Burrows</span>–<span>Wheeler</span> transform</a>. In <em>The expanding world of compressed data: A festschrift for <span>Giovanni</span> <span>Manzini</span>’s 60th birthday</em>, volume 131, pages 2:1–2:26. 2025.', citations.ziv78lz = 'Jacob Ziv and Abraham Lempel. <a href="https://doi.org/10.1109/TIT.1978.1055934">Compression of individual sequences via variable-rate coding</a>. <em><span>IEEE</span> Trans. Information Theory</em>, 24(5):530–536, 1978.', citations.welch84lzw = 'Terry A. Welch. <a href="https://doi.org/10.1109/MC.1984.1659158">A technique for high-performance data compression</a>. <em><span>IEEE</span> Computer</em>, 17(6):8–19, 1984.', citations.chen58lyndon = "Kuo Tsai Chen, Ralph H. Fox, and Roger C. Lyndon. Free differential calculus, <span>IV</span>. <span>T</span>he quotient groups of the lower central series. <em>Annals of Mathematics</em>, 68(1):81–95, 1958.", citations.manacher75new = 'Glenn K. Manacher. <a href="https://doi.org/10.1145/321892.321896">A new linear-time "on-line" algorithm for finding the smallest initial palindrome of a string</a>. <em>J. <span>ACM</span></em>, 22(3):346–351, 1975.', citations.manacher75new = 'Glenn K. Manacher. <a href="https://doi.org/10.1145/321892.321896">A new linear-time "on-line" algorithm for finding the smallest initial palindrome of a string</a>. <em>J. <span>ACM</span></em>, 22(3):346–351, 1975.', citations.kreft13lzend = 'Sebastian Kreft and Gonzalo Navarro. <a href="https://doi.org/10.1016/j.tcs.2012.02.006">On compressing and indexing repetitive sequences</a>. <em>Theor. Comput. Sci.</em>, 483:115–133, 2013.', citations.kempa18stringattractors = 'Dominik Kempa and Nicola Prezza. <a href="https://doi.org/10.1145/3188745.3188814">At the roots of dictionary compression: String attractors</a>. In <em>Proc. STOC</em>, pages 827–840. 2018.';
 const string_generators = {

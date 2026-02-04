@@ -361,13 +361,6 @@ body {
         <label for=qa-transform-list>Text Transforms:</label>
         <select id=qa-transform-list name=qa-transform-list>
           <option value=none>None</option>
-          <option value=bbw_transform title="Bijective Burrows-Wheeler Transform">BBWT</option>
-          <option value=inverse_bbw_transform title="Inverse Bijective Burrows-Wheeler Transform">BBWT⁻¹</option>
-          <option value=bw_transform title="Burrows-Wheeler Transform">BWT</option>
-          <option value=first_array title="First Column Array">F</option>
-          <option value=invert_transform title="Inverts a string by mapping each character to its complementary character">Invert</option>
-          <option value=necklace_conjugate_transform title="Lexicographically smallest conjugate of a given string.">necklace</option>
-          <option value=revert_transform title="Reverts a string by reading it backwards">Revert</option>
           <option value=custom>Custom</option>
         </select>
         <span id=qa-transform-active-span class=qa-hidden> 
@@ -872,6 +865,7 @@ const QA_UI = {
   structuresDisabled: null, // {string,index,length,factorization}
   countersEnabled: null,
   countersDisabled: null,
+  transformList: null,
 };
 
 const QA_STRUCTURE_TYPE_CLASS = {
@@ -926,9 +920,12 @@ function qa_install_ui_if_possible() {
   };
   QA_UI.countersEnabled = document.getElementById("qa-counter-enabled");
   QA_UI.countersDisabled = document.getElementById("qa-counter-disabled");
+  QA_UI.transformList = document.getElementById("qa-transform-list");
 
   // Mark installed even if some containers are missing (prevents repeated lookups)
   QA_UI.installed = true;
+
+  qa_rebuild_transform_list();
 
   // Render anything already defined
   for (const def of QA_REG.structures.values()) qa_render_structure(def);
@@ -937,14 +934,18 @@ function qa_install_ui_if_possible() {
 
 function qa_render_structure(def) {
   if (!qa_is_browser() || !QA_UI.installed) return;
+
+  // transform option rendering
+  qa_render_transform_option(def);
+
+  // structure element rendering
+  if (!qa_should_render_as_structure(def)) return;
   if (def._el) return;
 
-  // Require type for UI rendering
   const t = def.type;
   if (!t || !QA_UI.structuresDisabled[t]) throw new Error("Structure '" + def.id + "' missing/invalid type (string|index|length|factorization)");
 
   def._el = qa_make_item("structure", def);
-
   const parent = def.enabledByDefault ? QA_UI.structuresEnabled : QA_UI.structuresDisabled[t];
   if (parent) parent.appendChild(def._el);
 }
@@ -957,6 +958,88 @@ function qa_render_counter(def) {
   const parent = def.enabledByDefault ? QA_UI.countersEnabled : QA_UI.countersDisabled;
   if (parent) parent.appendChild(def._el);
 }
+
+function qa_default_stringtype(def) {
+  if (def && def.type === "string") {
+    return "transform-structure";
+  }
+  return null;
+}
+
+function qa_should_render_as_structure(def) {
+  if (!def) return false;
+  if (def.type === "string") {
+    const st = def.stringtype || qa_default_stringtype(def) || "structure-only";
+    return st !== "transform-only";
+  }
+  return true;
+}
+
+function qa_should_render_as_transform(def) {
+  if (!def || def.type !== "string") return false;
+  const st = def.stringtype || qa_default_stringtype(def) || "structure-only";
+  return st === "transform-only" || st === "transform-structure";
+}
+
+function qa_render_transform_option(def) {
+  if (!qa_is_browser() || !QA_UI.installed) return;
+  if (!QA_UI.transformList) return;
+  if (!qa_should_render_as_transform(def)) return;
+  if (def._opt) return;
+
+  const opt = document.createElement("option");
+  opt.value = def.id;
+  if (def.tooltip) opt.title = def.tooltip;
+  // prefer transformDisplayHtml if provided, else displayHtml
+  opt.innerHTML = def.transformDisplayHtml || def.displayHtml || def.id;
+  def._opt = opt;
+
+  // Insert before "custom" option if present; else append
+  const custom = QA_UI.transformList.querySelector('option[value="custom"]');
+  if (custom && custom.parentElement === QA_UI.transformList) {
+    QA_UI.transformList.insertBefore(opt, custom);
+  } else {
+    QA_UI.transformList.appendChild(opt);
+  }
+}
+
+function qa_rebuild_transform_list() {
+  if (!qa_is_browser() || !QA_UI.installed || !QA_UI.transformList) return;
+
+  const sel = QA_UI.transformList;
+  const prev = sel.value;
+
+  // Clear all options
+  while (sel.firstChild) sel.removeChild(sel.firstChild);
+
+  // None
+  const none = document.createElement("option");
+  none.value = "none";
+  none.textContent = "None";
+  sel.appendChild(none);
+
+  // Add transforms in definition order
+  for (const def of QA_REG.structures.values()) {
+    if (!qa_should_render_as_transform(def)) continue;
+    const opt = document.createElement("option");
+    opt.value = def.id;
+    if (def.tooltip) opt.title = def.tooltip;
+    opt.innerHTML = def.transformDisplayHtml || def.displayHtml || def.id;
+    def._opt = opt;
+    sel.appendChild(opt);
+  }
+
+  // Custom
+  const custom = document.createElement("option");
+  custom.value = "custom";
+  custom.textContent = "Custom";
+  sel.appendChild(custom);
+
+  // Restore previous selection if still valid
+  const still = sel.querySelector('option[value="' + prev + '"]');
+  sel.value = still ? prev : "none";
+}
+
 
 function defineStructure(def) {
   if (!def || !def.id) throw new Error("defineStructure: missing id");
@@ -1061,7 +1144,7 @@ function build_ds(text, request) {
 }
 
 // ---------------- Structure definitions ----------------
-defineStructure({ id: "text", displayHtml: "T", type: "string", deps: [], compute: (ctx) => ctx.text });
+defineStructure({ id: "text", displayHtml: "T", type: "string", stringtype: "structure-only", deps: [], compute: (ctx) => ctx.text });
 
 defineStructure({ id: "index_array", displayHtml: "i", tooltip: "Index Array", type: "index", deps: [], compute: (ctx) => {
     const t = ctx.text.length;
@@ -1115,7 +1198,7 @@ defineStructure({ id: "sl_string", displayHtml: "S/L", tooltip: "S/L SAIS type s
   return "S" == n[0] && (n[0] = "S*"), n
   } });
 
-defineStructure({ id: "invert_transform", displayHtml: "invert_transform", type: "string", deps: [], compute: (ctx) => {
+defineStructure({ id: "invert_transform", displayHtml: "Invert", type: "string", deps: [], compute: (ctx) => {
     const t = ctx.text;
 
   if (!t) return "";
@@ -1126,12 +1209,12 @@ defineStructure({ id: "invert_transform", displayHtml: "invert_transform", type:
     return String.fromCharCode(r.charCodeAt(0) - (t.charCodeAt(0) - n.charCodeAt(0)))
   }).join("")
   } });
-defineStructure({ id: "revert_transform", displayHtml: "revert_transform", type: "string", deps: [], compute: (ctx) => {
+defineStructure({ id: "revert_transform", displayHtml: "Revert", type: "string", deps: [], compute: (ctx) => {
     const t = ctx.text;
 
   return t ? t.split("").reverse().join("") : ""
   } });
-defineStructure({ id: "necklace_conjugate_transform", displayHtml: "necklace_conjugate_transform", type: "string", deps: [], compute: (ctx) => construct_necklace_conjugate_transform(ctx.text) });
+defineStructure({ id: "necklace_conjugate_transform", displayHtml: "Necklace Conjugate", type: "string", deps: [], compute: (ctx) => construct_necklace_conjugate_transform(ctx.text) });
 
 defineStructure({ id: "lcp_array", displayHtml: "LCP", tooltip: "Longest Common Prefix array", type: "length", deps: ["suffix_array"], compute: (ctx, sa) => {
     const t = ctx.text;

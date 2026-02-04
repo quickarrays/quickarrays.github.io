@@ -974,6 +974,7 @@ function defineStructure(def) {
       defineCounter({
         id: def.id,
         displayHtml: "runs(" + (def.displayHtml || def.id) + ")",
+        tooltip: "Number of runs in " + (def.displayHtml || def.id),
         deps: [def.id],
         compute: (ctx, str) => number_of_runs(str)
       });
@@ -981,6 +982,7 @@ function defineStructure(def) {
       defineCounter({
         id: def.id,
         displayHtml: "size(" + (def.displayHtml || def.id) + ")",
+        tooltip: "Number of factors in " + (def.displayHtml || def.id),
         deps: [def.id],
         compute: (ctx, str) => number_of_runs(str)
       });
@@ -1762,42 +1764,49 @@ defineStructure({
 defineCounter({
   id: "sigma",
   displayHtml: "σ",
+  tooltip: "Number of distinct characters in T",
   deps: [],
   compute: (ctx) => count_sigma(ctx.text)
 });
 defineCounter({
   id: "period",
   displayHtml: "p",
+  tooltip: "Minimal period of T",
   deps: ["border_array"],
   compute: (ctx, b) => count_period(b)
 });
 defineCounter({
   id: "exponent",
   displayHtml: "e",
+  tooltip: "Exponent of T",
   deps: ["border_array"],
   compute: (ctx, b) => count_exponent(b)
 });
 defineCounter({
   id: "regularity",
   displayHtml: "R",
+  tooltip: "Regularity (square, non-primitive, unbordered, or primitive)",
   deps: ["border_array"],
   compute: (ctx, b) => count_regularity(b)
 });
 defineCounter({
   id: "lcp_array",
   displayHtml: "Σ LCP",
+  tooltip: "Sum of entries of LCP",
   deps: ["lcp_array"],
   compute: (ctx, lcp) => count_lcp_array(lcp)
 });
 defineCounter({
   id: "delta",
   displayHtml: "δ",
+  tooltip: "Generalized substring complexity",
   deps: ["substring_complexity"],
   compute: (ctx, sc) => count_delta(sc)
 });
 defineCounter({
   id: "delta_argmax",
-  displayHtml: "max δ",
+  displayHtml: "arg-δ",
+  tooltip: "Minimal substring length that achieves δ",
   deps: ["substring_complexity"],
   compute: (ctx, sc) => count_delta_argmax(sc)
 });

@@ -499,595 +499,8 @@ self.onmessage = function(ev) {
 
   
 <script id=qa-shared>
-class AlgorithmError extends Error {
-  constructor(t, e, n) {
-    super(t), this.algorithm = e, this.input = n, this.name = "AlgorithmError"
-  }
-}
-
-function count_sigma(t) {
-  return t ? new Set(t).size : 0
-}
-
-function count_period(t) {
-  if (!t || 0 === t.length) return 0;
-  const e = t[t.length - 1];
-  return t.length - e
-}
-
-function count_exponent(t) {
-  if (!t || 0 === t.length) return 0;
-  const e = count_period(t);
-  return t.length / e
-}
-
-function count_regularity(t) {
-  if (!t || 0 === t.length) return "empty";
-  const e = t.length,
-    n = t[e - 1],
-    r = count_period(t),
-    i = count_exponent(t);
-  return i > 1 && e % r == 0 ? 2 == i ? "square" : "non-primitive" : 0 == n ? "unbordered" : "primitive"
-}
-
-function construct_first_array(t) {
-  return t ? [...t].sort().join("") : ""
-}
-
-function construct_inverse_suffix_array(t) {
-  if (!t) return [];
-  const e = new Array(t.length);
-  for (let n = 0; n < t.length; n++) e[t[n]] = n;
-  return e
-}
-
-function lcp_query(t, e, n) {
-  if (!t || e < 0 || n < 0 || e >= t.length || n >= t.length) return 0;
-  let r = 0;
-  const i = Math.min(t.length - e, t.length - n);
-  for (let a = 0; a < i && t[e + a] === t[n + a]; ++a) r++;
-  return r
-}
-
-function count_lcp_array(t) {
-  return t ? t.reduce((t, e) => t + e, 0) : 0
-}
-
-function delta(t) {
-  if (0 === t.length) throw new AlgorithmError("Input array 'substring_complexity' cannot be empty.", "delta", {
-    substring_complexity: t
-  });
-  let e = 1,
-    n = t[0];
-  for (let r = 1; r < t.length; ++r) {
-    const i = t[r] / (r + 1);
-    i > n && (e = r + 1, n = i)
-  }
-  return [e, n]
-}
-
-function count_delta(t) {
-  return t ? delta(t)[1] : 0
-}
-
-function count_delta_argmax(t) {
-  return t ? delta(t)[0] : 0
-}
-
-function conjugate_string(t, e) {
-  if (!t) return "";
-  if (e < 0 || e > t.length) throw new AlgorithmError("Shift value must be between 0 and the length of the string.", "conjugate_string", {
-    text: t,
-    shift: e
-  });
-  return 0 === t.length || 0 === e ? t : t.substring(e) + t.substring(0, e)
-}
-
-function select_query(t, e, n) {
-  if (!t) return -1;
-  if (n <= 0) throw new AlgorithmError("The 'nth' parameter must be a positive integer for 1-based indexing.", "select_query", {
-    text: t,
-    pattern: e,
-    nth: n
-  });
-  let r = -1;
-  for (let i = 0; i < n; ++i)
-    if (r = t.indexOf(e, r + 1), -1 === r) return -1;
-  return r
-}
-
-function rank_query(t, e, n) {
-  if (!t) return 0;
-  return [...t.slice(0, n)].filter(t => t === e).length
-}
-
-function construct_lpf_array(t) {
-  if (!t) return [];
-  const e = t.length,
-    n = new Array(e);
-  n[0] = 0;
-  for (let r = 1; r < e; r++) {
-    let i = 0;
-    for (let n = 0; n < r; n++) {
-      let a = 0;
-      for (; r + a < e && n + a < e && t[r + a] === t[n + a];) a++;
-      i = Math.max(i, a)
-    }
-    n[r] = i
-  }
-  return n
-}
-
-function greedy_factorize(t) {
-  if (!t) return [];
-  const e = t.length;
-  if (0 === e) return [];
-  const n = new Array(e).fill(!1);
-  for (let r = 0; r < e;) {
-    const e = t[r];
-    let i = 0 === e ? 1 : e;
-    n[r + i - 1] = !0, r += i
-  }
-  return n
-}
-
-function greedy_factorize_with_new_letter(t) {
-  if (!t) return [];
-  const e = t.length;
-  if (0 === e) return [];
-  const n = new Array(e).fill(!1);
-  for (let r = 0; r < e;) {
-    const i = t[r];
-    let a = 0 === i ? 1 : Math.min(i + 1, e - r);
-    n[r + a - 1] = !0, r += a
-  }
-  return n
-}
-
-function construct_necklace_conjugate_transform(t) {
-  if (!t) return "";
-  const e = t.length;
-  let n = t;
-  for (let r = 0; r < e; ++r) {
-    const e = conjugate_string(t, r);
-    e < n && (n = e)
-  }
-  return n
-}
-
-function phrases_from_factorizations(t, e) {
-  if (!t || !e) return [];
-  const n = t.length,
-    r = [];
-  let i = 0;
-  for (let a = 0; a < n; ++a)
-    if (!0 === e[a]) {
-      let e = t.slice(i, a + 1);
-      i = a + 1, r.push(e)
-    } return r
-}
-
-function omega_order(t, e) {
-  if (void 0 === t || void 0 === e) throw new AlgorithmError("Undefined string input(s) for omega order comparison.", "OmegaOrder", {
-    strA: t,
-    strB: e
-  });
-  if (t === e) return 0;
-  const n = 3 * Math.max(t.length, e.length);
-  for (let r = 0; r < n; ++r) {
-    if (t[r % t.length] < e[r % e.length]) return -1;
-    if (t[r % t.length] > e[r % e.length]) return 1
-  }
-  return t.length < e.length ? -1 : 1
-}
-
-function construct_inverse_bbw_transform(t) {
-  if (!t) return "";
-  let e = t.length;
-  var n = construct_first_array(t),
-    r = new Array(e).fill(0),
-    i = [];
-  for (let o = 0; o < e; ++o) {
-    let e = [];
-    if (1 == r[o]) continue;
-    for (var a = o; 0 == r[a];) {
-      r[a] = !0, e.push(t[a]);
-      let i = n[a],
-        o = rank_query(n, i, a + 1);
-      if (0 == o) throw new AlgorithmError("character_number is zero in inverse BBWT", "construct_inverse_bbw_transform", t);
-      if (t.split(i).length + 1 <= o) throw new AlgorithmError("character_number exceeds occurrences in inverse BBWT", "construct_inverse_bbw_transform", t);
-      a = select_query(t, i, o)
-    }
-    const s = construct_necklace_conjugate_transform(e.join(""));
-    i.push(s)
-  }
-  return i.sort(), i.reverse(), i.join("")
-}
-
-function random_ternary_string(t) {
-  let e = "";
-  for (let n = 0; n < t; n++) {
-    const t = Math.floor(3 * Math.random());
-    e += "abc".charAt(t)
-  }
-  return e
-}
-
-function construct_lzw_factorization(t) {
-  if (!t) return [];
-  const e = t.length,
-    n = new Array(e).fill(!1),
-    r = new Map;
-  for (let n = 0; n < e; n++) {
-    const e = t[n];
-    r.has(e) || r.set(e, r.size)
-  }
-  for (let i = 0; i < e;) {
-    let a = "";
-    for (let n = i; n < e; n++)
-      if (a += t[n], !r.has(a)) {
-        a = a.slice(0, -1);
-        break
-      } let o = i + a.length - 1;
-    if (o >= e) {
-      n[e - 1] = !0;
-      break
-    }
-    if (0 == a.length) throw new AlgorithmError("LZW factorization failed to find a valid substring.", "construct_lzw_factorization", {
-      text: t
-    });
-    n[o] = !0, i + a.length < e && (a += t[i + a.length]), r.has(a) || r.set(a, r.size), i = o + 1
-  }
-  return n
-}
-
-function get_lzend_reference(t, e, n) {
-  let r = 0;
-  for (; - 1 !== (r = t.indexOf(e, r));) {
-    if (n[r + e.length - 1]) return r;
-    r += e.length
-  }
-  return -1
-}
-
-function is_stringattractor(t, e) {
-  const n = t.length,
-    r = new Set(e);
-  for (let e = 0; e < n; e++) {
-    let i = "";
-    for (let a = e; a < n; a++) {
-      i += t[a];
-      let e = !1;
-      for (let a = 0; a + i.length <= n; a++) {
-        if (t.slice(a, a + i.length) === i)
-          for (let t = a; t < a + i.length; t++)
-            if (r.has(t)) {
-              e = !0;
-              break
-            } if (e) break
-      }
-      if (!e) return !1
-    }
-  }
-  return !0
-}
-
-function factorization_to_positions(t) {
-  const e = [];
-  for (let n = 0; n < t.length; n++) t[n] && e.push(n);
-  return e
-}
-// ---------------- Registry (Path B) ----------------
-const QA_REG = {
-  structures: new Map(), // id -> { deps:[], compute(ctx, ...depsVals), ...uiMeta }
-  counters: new Map(), // id -> { deps:[], compute(ctx, ...depsVals), ...uiMeta }
-  counterAssociations: new Map(), // structureId -> list of counter Ids
-};
-
-function qa_is_browser() {
-  return typeof document !== "undefined" && typeof window !== "undefined";
-}
-const QA_UI = {
-  installed: false,
-  structuresEnabled: null,
-  structuresDisabled: null, // {string,index,length,factorization}
-  countersEnabled: null,
-  countersDisabled: null,
-  transformList: null,
-};
-const QA_STRUCTURE_TYPE_CLASS = {
-  string: "qa-structure-string",
-  index: "qa-structure-index",
-  length: "qa-structure-length",
-  factorization: "qa-structure-factor",
-};
-
-function qa_make_item(kind, def) {
-  const el = document.createElement("div");
-  if (kind === "structure") {
-    const cls = QA_STRUCTURE_TYPE_CLASS[def.type] || "";
-    el.className = ("qa-item qa-structure qa-item qa-structure " + cls).replace(/\s+/g, " ").trim();
-  } else {
-    el.className = "qa-item qa-counter qa-item qa-counter";
-  }
-  el.dataset.ds = def.id;
-  // symbolHtml is optional; fallback to existing mapping if present; else id
-  let sym = def.displayHtml || def.symbolHtml;
-  if (!sym && kind === "structure" && typeof globalThis.ds_name2html === "object" && globalThis.ds_name2html && globalThis.ds_name2html[def.id]) {
-    sym = globalThis.ds_name2html[def.id];
-  }
-  if (!sym && kind === "counter" && typeof globalThis.counter_name2html === "object" && globalThis.counter_name2html && globalThis.counter_name2html[def.id]) {
-    sym = globalThis.counter_name2html[def.id];
-  }
-  if (!sym) sym = def.id;
-  el.innerHTML = sym;
-  const tooltip = def.tooltip || (def.tutorial && def.tutorial.title) || "";
-  if (tooltip) {
-    const tt = document.createElement("span");
-    tt.className = "qa-tooltiptext";
-    tt.textContent = tooltip;
-    el.appendChild(tt);
-  }
-  return el;
-}
-
-function qa_install_ui_if_possible() {
-  if (!qa_is_browser()) return;
-  if (QA_UI.installed) return;
-  QA_UI.structuresEnabled = document.getElementById("qa-structures-enabled");
-  QA_UI.structuresDisabled = {
-    string: document.getElementById("qa-structures-disabled-string"),
-    index: document.getElementById("qa-structures-disabled-index"),
-    length: document.getElementById("qa-structures-disabled-length"),
-    factorization: document.getElementById("qa-structures-disabled-factor"),
-  };
-  QA_UI.countersEnabled = document.getElementById("qa-counter-enabled");
-  QA_UI.countersDisabled = document.getElementById("qa-counter-disabled");
-  QA_UI.transformList = document.getElementById("qa-transform-list");
-  // Mark installed even if some containers are missing (prevents repeated lookups)
-  QA_UI.installed = true;
-  qa_rebuild_transform_list();
-  // Render anything already defined
-  for (const def of QA_REG.structures.values()) qa_render_structure(def);
-  for (const def of QA_REG.counters.values()) qa_render_counter(def);
-}
-
-function qa_render_structure(def) {
-  if (!qa_is_browser() || !QA_UI.installed) return;
-  // transform option rendering
-  qa_render_transform_option(def);
-  // structure element rendering
-  if (!qa_should_render_as_structure(def)) return;
-  if (def._el) return;
-  const t = def.type;
-  if (!t || !QA_UI.structuresDisabled[t]) throw new Error("Structure '" + def.id + "' missing/invalid type (string|index|length|factorization)");
-  def._el = qa_make_item("structure", def);
-  const parent = def.enabledByDefault ? QA_UI.structuresEnabled : QA_UI.structuresDisabled[t];
-  if (parent) parent.appendChild(def._el);
-}
-
-function qa_render_counter(def) {
-  if (!qa_is_browser() || !QA_UI.installed) return;
-  if (def._el) return;
-  def._el = qa_make_item("counter", def);
-  const parent = def.enabledByDefault ? QA_UI.countersEnabled : QA_UI.countersDisabled;
-  if (parent) parent.appendChild(def._el);
-}
-
-function qa_default_stringtype(def) {
-  if (def && def.type === "string") {
-    return "transform-structure";
-  }
-  return null;
-}
-
-function qa_should_render_as_structure(def) {
-  if (!def) return false;
-  if (def.type === "string") {
-    const st = def.stringtype || qa_default_stringtype(def) || "structure-only";
-    return st !== "transform-only";
-  }
-  return true;
-}
-
-function qa_should_render_as_transform(def) {
-  if (!def || def.type !== "string") return false;
-  const st = def.stringtype || qa_default_stringtype(def) || "structure-only";
-  return st === "transform-only" || st === "transform-structure";
-}
-
-function qa_render_transform_option(def) {
-  if (!qa_is_browser() || !QA_UI.installed) return;
-  if (!QA_UI.transformList) return;
-  if (!qa_should_render_as_transform(def)) return;
-  if (def._opt) return;
-  const opt = document.createElement("option");
-  opt.value = def.id;
-  if (def.tooltip) opt.title = def.tooltip;
-  // prefer transformDisplayHtml if provided, else displayHtml
-  opt.innerHTML = def.transformDisplayHtml || def.displayHtml || def.id;
-  def._opt = opt;
-  // Insert before "custom" option if present; else append
-  const custom = QA_UI.transformList.querySelector('option[value="custom"]');
-  if (custom && custom.parentElement === QA_UI.transformList) {
-    QA_UI.transformList.insertBefore(opt, custom);
-  } else {
-    QA_UI.transformList.appendChild(opt);
-  }
-}
-
-function qa_rebuild_transform_list() {
-  if (!qa_is_browser() || !QA_UI.installed || !QA_UI.transformList) return;
-  const sel = QA_UI.transformList;
-  const prev = sel.value;
-  // Clear all options
-  while (sel.firstChild) sel.removeChild(sel.firstChild);
-  // None
-  const none = document.createElement("option");
-  none.value = "none";
-  none.textContent = "None";
-  sel.appendChild(none);
-  // Add transforms in definition order
-  for (const def of QA_REG.structures.values()) {
-    if (!qa_should_render_as_transform(def)) continue;
-    const opt = document.createElement("option");
-    opt.value = def.id;
-    if (def.tooltip) opt.title = def.tooltip;
-    opt.innerHTML = def.transformDisplayHtml || def.displayHtml || def.id;
-    def._opt = opt;
-    sel.appendChild(opt);
-  }
-  // Custom
-  const custom = document.createElement("option");
-  custom.value = "custom";
-  custom.textContent = "Custom";
-  sel.appendChild(custom);
-  // Restore previous selection if still valid
-  const still = sel.querySelector('option[value="' + prev + '"]');
-  sel.value = still ? prev : "none";
-}
-
-function defineStructure(def) {
-  if (!def || !def.id) throw new Error("defineStructure: missing id");
-  if (QA_REG.structures.has(def.id)) throw new Error("defineStructure: duplicate " + def.id);
-  // Back-compat: if tutorials[id] exists, auto-attach it unless overridden
-  if (def.tutorial === undefined && typeof globalThis.tutorials === "object" && globalThis.tutorials && globalThis.tutorials[def.id]) {
-    def.tutorial = globalThis.tutorials[def.id];
-  }
-  def.deps = def.deps || [];
-  QA_REG.structures.set(def.id, def);
-  // register tutorial for update_tutorial()
-  if (def.tutorial) {
-    if (typeof globalThis.tutorials !== "object" || !globalThis.tutorials) globalThis.tutorials = {};
-    globalThis.tutorials[def.id] = def.tutorial;
-  }
-  // create/render DOM element if running in browser
-  if (qa_is_browser()) {
-    if (QA_UI.installed) qa_render_structure(def);
-  }
+const createStructuresAndCounters = function () {
   
-  const autoCounterEnabled =
-    (typeof def.autoCounter !== "undefined" && def.autoCounter === true) ||
-    typeof def.autoCounter === "undefined";
-    
-  if (autoCounterEnabled) {
-    if (def.type === "string") {
-      defineCounter({
-        id: def.id,
-        displayHtml: "runs(" + (def.displayHtml || def.id) + ")",
-        tooltip: "Number of runs in " + (def.displayHtml || def.id),
-        deps: [def.id],
-        compute: (ctx, str) => number_of_runs(str)
-      });
-      defineCounterAssociation(def.id, def.id);
-    } else if (def.type === "factorization") {
-      defineCounter({
-        id: def.id,
-        displayHtml: "size(" + (def.displayHtml || def.id) + ")",
-        tooltip: "Number of factors in " + (def.displayHtml || def.id),
-        deps: [def.id],
-        compute: (ctx, str) => number_of_runs(str)
-      });
-      defineCounterAssociation(def.id, def.id);
-    }
-  }
-}
-
-function defineCounter(def) {
-  if (!def || !def.id) throw new Error("defineCounter: missing id");
-  if (QA_REG.counters.has(def.id)) throw new Error("defineCounter: duplicate " + def.id);
-  if (def.tutorial === undefined && typeof globalThis.tutorials === "object" && globalThis.tutorials && globalThis.tutorials[def.id]) {
-    def.tutorial = globalThis.tutorials[def.id];
-  }
-  def.deps = def.deps || [];
-  QA_REG.counters.set(def.id, def);
-  if (def.tutorial) {
-    if (typeof globalThis.tutorials !== "object" || !globalThis.tutorials) globalThis.tutorials = {};
-    globalThis.tutorials[def.id] = def.tutorial;
-  }
-  if (qa_is_browser()) {
-    if (QA_UI.installed) qa_render_counter(def);
-  }
-}
-
-function defineCounterAssociation(structureId, counterIds) {
-  if (!structureId || typeof structureId !== "string") throw new Error("defineCounterAssociation: missing/invalid structureId");
-  let ids = counterIds;
-  if (ids == null) ids = [];
-  if (typeof ids === "string") ids = [ids];
-  if (!Array.isArray(ids)) throw new Error("defineCounterAssociation: counterIds must be an array (or a string)");
-
-  // normalize + dedupe while preserving order
-  const seen = new Set();
-  const norm = [];
-  for (const id of ids) {
-    if (typeof id !== "string" || !id) continue;
-    if (!seen.has(id)) {
-      seen.add(id);
-      norm.push(id);
-    }
-  }
-
-  // Otherwise, treat as "add" (can be called multiple times).
-  const existing = QA_REG.counterAssociations.get(structureId) || [];
-  const merged = existing.slice();
-  const mergedSeen = new Set(existing);
-  for (const id of norm) {
-    if (!mergedSeen.has(id)) {
-      mergedSeen.add(id);
-      merged.push(id);
-    }
-  }
-  QA_REG.counterAssociations.set(structureId, merged);
-}
-
-
-
-function makeBuildContext(text) {
-  return {
-    text,
-    _s: new Map(),
-    _c: new Map(),
-    getStructure(id) {
-      if (id === "text") return this.text; // special structure
-      if (this._s.has(id)) return this._s.get(id);
-      const def = QA_REG.structures.get(id);
-      if (!def) throw new Error("Unknown structure: " + id);
-      const depVals = def.deps.map(d => this.getStructure(d));
-      const val = def.compute(this, ...depVals);
-      this._s.set(id, val);
-      return val;
-    },
-    getCounter(id) {
-      if (this._c.has(id)) return this._c.get(id);
-      const def = QA_REG.counters.get(id);
-      if (!def) return undefined; // allow UI to show "not defined" for legacy counters
-      const depVals = def.deps.map(d => this.getStructure(d)); // counter deps are structures
-      const val = def.compute(this, ...depVals);
-      this._c.set(id, val);
-      return val;
-    },
-  };
-}
-// New build_ds signature:
-// request = { structures: string[], counters: string[] }
-function build_ds(text, request) {
-  const req = request || {};
-  const structures = Array.isArray(req.structures) ? req.structures : [];
-  const counters = Array.isArray(req.counters) ? req.counters : [];
-  const ctx = makeBuildContext(text);
-  const out = {};
-  // Structures
-  for (const id of structures) {
-    out[id] = ctx.getStructure(id);
-  }
-  // Counters => output key must stay "counter_<id>" because fill_updates expects that
-  for (const id of counters) {
-    const v = ctx.getCounter(id);
-    if (v !== undefined) out["counter_" + id] = v;
-  }
-  return out;
-}
 // ---------------- Structure definitions ----------------
 defineStructure({
   id: "text",
@@ -1899,7 +1312,604 @@ defineCounter({
 defineCounterAssociation("text", ["text", "sigma"]);
 defineCounterAssociation("border_array", ["period", "exponent", "regularity"]);
 defineCounterAssociation("lcp_array", ["sum_of_lcp_array", "delta", "delta_argmax"]);
-defineCounterAssociation("substring_complexity", ["delta", "delta_argmax"]);
+defineCounterAssociation("substring_complexity", ["delta", "delta_argmax"]); 
+
+
+
+}; // END OF createStructuresAndCounters();
+  
+class AlgorithmError extends Error {
+  constructor(t, e, n) {
+    super(t), this.algorithm = e, this.input = n, this.name = "AlgorithmError"
+  }
+}
+
+function count_sigma(t) {
+  return t ? new Set(t).size : 0
+}
+
+function count_period(t) {
+  if (!t || 0 === t.length) return 0;
+  const e = t[t.length - 1];
+  return t.length - e
+}
+
+function count_exponent(t) {
+  if (!t || 0 === t.length) return 0;
+  const e = count_period(t);
+  return t.length / e
+}
+
+function count_regularity(t) {
+  if (!t || 0 === t.length) return "empty";
+  const e = t.length,
+    n = t[e - 1],
+    r = count_period(t),
+    i = count_exponent(t);
+  return i > 1 && e % r == 0 ? 2 == i ? "square" : "non-primitive" : 0 == n ? "unbordered" : "primitive"
+}
+
+function construct_first_array(t) {
+  return t ? [...t].sort().join("") : ""
+}
+
+function construct_inverse_suffix_array(t) {
+  if (!t) return [];
+  const e = new Array(t.length);
+  for (let n = 0; n < t.length; n++) e[t[n]] = n;
+  return e
+}
+
+function lcp_query(t, e, n) {
+  if (!t || e < 0 || n < 0 || e >= t.length || n >= t.length) return 0;
+  let r = 0;
+  const i = Math.min(t.length - e, t.length - n);
+  for (let a = 0; a < i && t[e + a] === t[n + a]; ++a) r++;
+  return r
+}
+
+function count_lcp_array(t) {
+  return t ? t.reduce((t, e) => t + e, 0) : 0
+}
+
+function delta(t) {
+  if (0 === t.length) throw new AlgorithmError("Input array 'substring_complexity' cannot be empty.", "delta", {
+    substring_complexity: t
+  });
+  let e = 1,
+    n = t[0];
+  for (let r = 1; r < t.length; ++r) {
+    const i = t[r] / (r + 1);
+    i > n && (e = r + 1, n = i)
+  }
+  return [e, n]
+}
+
+function count_delta(t) {
+  return t ? delta(t)[1] : 0
+}
+
+function count_delta_argmax(t) {
+  return t ? delta(t)[0] : 0
+}
+
+function conjugate_string(t, e) {
+  if (!t) return "";
+  if (e < 0 || e > t.length) throw new AlgorithmError("Shift value must be between 0 and the length of the string.", "conjugate_string", {
+    text: t,
+    shift: e
+  });
+  return 0 === t.length || 0 === e ? t : t.substring(e) + t.substring(0, e)
+}
+
+function select_query(t, e, n) {
+  if (!t) return -1;
+  if (n <= 0) throw new AlgorithmError("The 'nth' parameter must be a positive integer for 1-based indexing.", "select_query", {
+    text: t,
+    pattern: e,
+    nth: n
+  });
+  let r = -1;
+  for (let i = 0; i < n; ++i)
+    if (r = t.indexOf(e, r + 1), -1 === r) return -1;
+  return r
+}
+
+function rank_query(t, e, n) {
+  if (!t) return 0;
+  return [...t.slice(0, n)].filter(t => t === e).length
+}
+
+function construct_lpf_array(t) {
+  if (!t) return [];
+  const e = t.length,
+    n = new Array(e);
+  n[0] = 0;
+  for (let r = 1; r < e; r++) {
+    let i = 0;
+    for (let n = 0; n < r; n++) {
+      let a = 0;
+      for (; r + a < e && n + a < e && t[r + a] === t[n + a];) a++;
+      i = Math.max(i, a)
+    }
+    n[r] = i
+  }
+  return n
+}
+
+function greedy_factorize(t) {
+  if (!t) return [];
+  const e = t.length;
+  if (0 === e) return [];
+  const n = new Array(e).fill(!1);
+  for (let r = 0; r < e;) {
+    const e = t[r];
+    let i = 0 === e ? 1 : e;
+    n[r + i - 1] = !0, r += i
+  }
+  return n
+}
+
+function greedy_factorize_with_new_letter(t) {
+  if (!t) return [];
+  const e = t.length;
+  if (0 === e) return [];
+  const n = new Array(e).fill(!1);
+  for (let r = 0; r < e;) {
+    const i = t[r];
+    let a = 0 === i ? 1 : Math.min(i + 1, e - r);
+    n[r + a - 1] = !0, r += a
+  }
+  return n
+}
+
+function construct_necklace_conjugate_transform(t) {
+  if (!t) return "";
+  const e = t.length;
+  let n = t;
+  for (let r = 0; r < e; ++r) {
+    const e = conjugate_string(t, r);
+    e < n && (n = e)
+  }
+  return n
+}
+
+function phrases_from_factorizations(t, e) {
+  if (!t || !e) return [];
+  const n = t.length,
+    r = [];
+  let i = 0;
+  for (let a = 0; a < n; ++a)
+    if (!0 === e[a]) {
+      let e = t.slice(i, a + 1);
+      i = a + 1, r.push(e)
+    } return r
+}
+
+function omega_order(t, e) {
+  if (void 0 === t || void 0 === e) throw new AlgorithmError("Undefined string input(s) for omega order comparison.", "OmegaOrder", {
+    strA: t,
+    strB: e
+  });
+  if (t === e) return 0;
+  const n = 3 * Math.max(t.length, e.length);
+  for (let r = 0; r < n; ++r) {
+    if (t[r % t.length] < e[r % e.length]) return -1;
+    if (t[r % t.length] > e[r % e.length]) return 1
+  }
+  return t.length < e.length ? -1 : 1
+}
+
+function construct_inverse_bbw_transform(t) {
+  if (!t) return "";
+  let e = t.length;
+  var n = construct_first_array(t),
+    r = new Array(e).fill(0),
+    i = [];
+  for (let o = 0; o < e; ++o) {
+    let e = [];
+    if (1 == r[o]) continue;
+    for (var a = o; 0 == r[a];) {
+      r[a] = !0, e.push(t[a]);
+      let i = n[a],
+        o = rank_query(n, i, a + 1);
+      if (0 == o) throw new AlgorithmError("character_number is zero in inverse BBWT", "construct_inverse_bbw_transform", t);
+      if (t.split(i).length + 1 <= o) throw new AlgorithmError("character_number exceeds occurrences in inverse BBWT", "construct_inverse_bbw_transform", t);
+      a = select_query(t, i, o)
+    }
+    const s = construct_necklace_conjugate_transform(e.join(""));
+    i.push(s)
+  }
+  return i.sort(), i.reverse(), i.join("")
+}
+
+function random_ternary_string(t) {
+  let e = "";
+  for (let n = 0; n < t; n++) {
+    const t = Math.floor(3 * Math.random());
+    e += "abc".charAt(t)
+  }
+  return e
+}
+
+function construct_lzw_factorization(t) {
+  if (!t) return [];
+  const e = t.length,
+    n = new Array(e).fill(!1),
+    r = new Map;
+  for (let n = 0; n < e; n++) {
+    const e = t[n];
+    r.has(e) || r.set(e, r.size)
+  }
+  for (let i = 0; i < e;) {
+    let a = "";
+    for (let n = i; n < e; n++)
+      if (a += t[n], !r.has(a)) {
+        a = a.slice(0, -1);
+        break
+      } let o = i + a.length - 1;
+    if (o >= e) {
+      n[e - 1] = !0;
+      break
+    }
+    if (0 == a.length) throw new AlgorithmError("LZW factorization failed to find a valid substring.", "construct_lzw_factorization", {
+      text: t
+    });
+    n[o] = !0, i + a.length < e && (a += t[i + a.length]), r.has(a) || r.set(a, r.size), i = o + 1
+  }
+  return n
+}
+
+function get_lzend_reference(t, e, n) {
+  let r = 0;
+  for (; - 1 !== (r = t.indexOf(e, r));) {
+    if (n[r + e.length - 1]) return r;
+    r += e.length
+  }
+  return -1
+}
+
+function is_stringattractor(t, e) {
+  const n = t.length,
+    r = new Set(e);
+  for (let e = 0; e < n; e++) {
+    let i = "";
+    for (let a = e; a < n; a++) {
+      i += t[a];
+      let e = !1;
+      for (let a = 0; a + i.length <= n; a++) {
+        if (t.slice(a, a + i.length) === i)
+          for (let t = a; t < a + i.length; t++)
+            if (r.has(t)) {
+              e = !0;
+              break
+            } if (e) break
+      }
+      if (!e) return !1
+    }
+  }
+  return !0
+}
+
+function factorization_to_positions(t) {
+  const e = [];
+  for (let n = 0; n < t.length; n++) t[n] && e.push(n);
+  return e
+}
+// ---------------- Registry (Path B) ----------------
+const QA_REG = {
+  structures: new Map(), // id -> { deps:[], compute(ctx, ...depsVals), ...uiMeta }
+  counters: new Map(), // id -> { deps:[], compute(ctx, ...depsVals), ...uiMeta }
+  counterAssociations: new Map(), // structureId -> list of counter Ids
+};
+
+function qa_is_browser() {
+  return typeof document !== "undefined" && typeof window !== "undefined";
+}
+const QA_UI = {
+  installed: false,
+  structuresEnabled: null,
+  structuresDisabled: null, // {string,index,length,factorization}
+  countersEnabled: null,
+  countersDisabled: null,
+  transformList: null,
+};
+const QA_STRUCTURE_TYPE_CLASS = {
+  string: "qa-structure-string",
+  index: "qa-structure-index",
+  length: "qa-structure-length",
+  factorization: "qa-structure-factor",
+};
+
+function qa_make_item(kind, def) {
+  const el = document.createElement("div");
+  if (kind === "structure") {
+    const cls = QA_STRUCTURE_TYPE_CLASS[def.type] || "";
+    el.className = ("qa-item qa-structure qa-item qa-structure " + cls).replace(/\s+/g, " ").trim();
+  } else {
+    el.className = "qa-item qa-counter qa-item qa-counter";
+  }
+  el.dataset.ds = def.id;
+  // symbolHtml is optional; fallback to existing mapping if present; else id
+  let sym = def.displayHtml || def.symbolHtml;
+  if (!sym && kind === "structure" && typeof globalThis.ds_name2html === "object" && globalThis.ds_name2html && globalThis.ds_name2html[def.id]) {
+    sym = globalThis.ds_name2html[def.id];
+  }
+  if (!sym && kind === "counter" && typeof globalThis.counter_name2html === "object" && globalThis.counter_name2html && globalThis.counter_name2html[def.id]) {
+    sym = globalThis.counter_name2html[def.id];
+  }
+  if (!sym) sym = def.id;
+  el.innerHTML = sym;
+  const tooltip = def.tooltip || (def.tutorial && def.tutorial.title) || "";
+  if (tooltip) {
+    const tt = document.createElement("span");
+    tt.className = "qa-tooltiptext";
+    tt.textContent = tooltip;
+    el.appendChild(tt);
+  }
+  return el;
+}
+
+function qa_install_ui_if_possible() {
+  if (!qa_is_browser()) return;
+  if (QA_UI.installed) return;
+  QA_UI.structuresEnabled = document.getElementById("qa-structures-enabled");
+  QA_UI.structuresDisabled = {
+    string: document.getElementById("qa-structures-disabled-string"),
+    index: document.getElementById("qa-structures-disabled-index"),
+    length: document.getElementById("qa-structures-disabled-length"),
+    factorization: document.getElementById("qa-structures-disabled-factor"),
+  };
+  QA_UI.countersEnabled = document.getElementById("qa-counter-enabled");
+  QA_UI.countersDisabled = document.getElementById("qa-counter-disabled");
+  QA_UI.transformList = document.getElementById("qa-transform-list");
+  // Mark installed even if some containers are missing (prevents repeated lookups)
+  QA_UI.installed = true;
+  qa_rebuild_transform_list();
+  // Render anything already defined
+  for (const def of QA_REG.structures.values()) qa_render_structure(def);
+  for (const def of QA_REG.counters.values()) qa_render_counter(def);
+}
+
+function qa_render_structure(def) {
+  if (!qa_is_browser() || !QA_UI.installed) return;
+  // transform option rendering
+  qa_render_transform_option(def);
+  // structure element rendering
+  if (!qa_should_render_as_structure(def)) return;
+  if (def._el) return;
+  const t = def.type;
+  if (!t || !QA_UI.structuresDisabled[t]) throw new Error("Structure '" + def.id + "' missing/invalid type (string|index|length|factorization)");
+  def._el = qa_make_item("structure", def);
+  const parent = def.enabledByDefault ? QA_UI.structuresEnabled : QA_UI.structuresDisabled[t];
+  if (parent) parent.appendChild(def._el);
+}
+
+function qa_render_counter(def) {
+  if (!qa_is_browser() || !QA_UI.installed) return;
+  if (def._el) return;
+  def._el = qa_make_item("counter", def);
+  const parent = def.enabledByDefault ? QA_UI.countersEnabled : QA_UI.countersDisabled;
+  if (parent) parent.appendChild(def._el);
+}
+
+function qa_default_stringtype(def) {
+  if (def && def.type === "string") {
+    return "transform-structure";
+  }
+  return null;
+}
+
+function qa_should_render_as_structure(def) {
+  if (!def) return false;
+  if (def.type === "string") {
+    const st = def.stringtype || qa_default_stringtype(def) || "structure-only";
+    return st !== "transform-only";
+  }
+  return true;
+}
+
+function qa_should_render_as_transform(def) {
+  if (!def || def.type !== "string") return false;
+  const st = def.stringtype || qa_default_stringtype(def) || "structure-only";
+  return st === "transform-only" || st === "transform-structure";
+}
+
+function qa_render_transform_option(def) {
+  if (!qa_is_browser() || !QA_UI.installed) return;
+  if (!QA_UI.transformList) return;
+  if (!qa_should_render_as_transform(def)) return;
+  if (def._opt) return;
+  const opt = document.createElement("option");
+  opt.value = def.id;
+  if (def.tooltip) opt.title = def.tooltip;
+  // prefer transformDisplayHtml if provided, else displayHtml
+  opt.innerHTML = def.transformDisplayHtml || def.displayHtml || def.id;
+  def._opt = opt;
+  // Insert before "custom" option if present; else append
+  const custom = QA_UI.transformList.querySelector('option[value="custom"]');
+  if (custom && custom.parentElement === QA_UI.transformList) {
+    QA_UI.transformList.insertBefore(opt, custom);
+  } else {
+    QA_UI.transformList.appendChild(opt);
+  }
+}
+
+function qa_rebuild_transform_list() {
+  if (!qa_is_browser() || !QA_UI.installed || !QA_UI.transformList) return;
+  const sel = QA_UI.transformList;
+  const prev = sel.value;
+  // Clear all options
+  while (sel.firstChild) sel.removeChild(sel.firstChild);
+  // None
+  const none = document.createElement("option");
+  none.value = "none";
+  none.textContent = "None";
+  sel.appendChild(none);
+  // Add transforms in definition order
+  for (const def of QA_REG.structures.values()) {
+    if (!qa_should_render_as_transform(def)) continue;
+    const opt = document.createElement("option");
+    opt.value = def.id;
+    if (def.tooltip) opt.title = def.tooltip;
+    opt.innerHTML = def.transformDisplayHtml || def.displayHtml || def.id;
+    def._opt = opt;
+    sel.appendChild(opt);
+  }
+  // Custom
+  const custom = document.createElement("option");
+  custom.value = "custom";
+  custom.textContent = "Custom";
+  sel.appendChild(custom);
+  // Restore previous selection if still valid
+  const still = sel.querySelector('option[value="' + prev + '"]');
+  sel.value = still ? prev : "none";
+}
+
+function defineStructure(def) {
+  if (!def || !def.id) throw new Error("defineStructure: missing id");
+  if (QA_REG.structures.has(def.id)) throw new Error("defineStructure: duplicate " + def.id);
+  // Back-compat: if tutorials[id] exists, auto-attach it unless overridden
+  if (def.tutorial === undefined && typeof globalThis.tutorials === "object" && globalThis.tutorials && globalThis.tutorials[def.id]) {
+    def.tutorial = globalThis.tutorials[def.id];
+  }
+  def.deps = def.deps || [];
+  QA_REG.structures.set(def.id, def);
+  // register tutorial for update_tutorial()
+  if (def.tutorial) {
+    if (typeof globalThis.tutorials !== "object" || !globalThis.tutorials) globalThis.tutorials = {};
+    globalThis.tutorials[def.id] = def.tutorial;
+  }
+  // create/render DOM element if running in browser
+  if (qa_is_browser()) {
+    if (QA_UI.installed) qa_render_structure(def);
+  }
+  
+  const autoCounterEnabled =
+    (typeof def.autoCounter !== "undefined" && def.autoCounter === true) ||
+    typeof def.autoCounter === "undefined";
+    
+  if (autoCounterEnabled) {
+    if (def.type === "string") {
+      defineCounter({
+        id: def.id,
+        displayHtml: "runs(" + (def.displayHtml || def.id) + ")",
+        tooltip: "Number of runs in " + (def.displayHtml || def.id),
+        deps: [def.id],
+        compute: (ctx, str) => number_of_runs(str)
+      });
+      defineCounterAssociation(def.id, def.id);
+    } else if (def.type === "factorization") {
+      defineCounter({
+        id: def.id,
+        displayHtml: "size(" + (def.displayHtml || def.id) + ")",
+        tooltip: "Number of factors in " + (def.displayHtml || def.id),
+        deps: [def.id],
+        compute: (ctx, str) => number_of_runs(str)
+      });
+      defineCounterAssociation(def.id, def.id);
+    }
+  }
+}
+
+function defineCounter(def) {
+  if (!def || !def.id) throw new Error("defineCounter: missing id");
+  if (QA_REG.counters.has(def.id)) throw new Error("defineCounter: duplicate " + def.id);
+  if (def.tutorial === undefined && typeof globalThis.tutorials === "object" && globalThis.tutorials && globalThis.tutorials[def.id]) {
+    def.tutorial = globalThis.tutorials[def.id];
+  }
+  def.deps = def.deps || [];
+  QA_REG.counters.set(def.id, def);
+  if (def.tutorial) {
+    if (typeof globalThis.tutorials !== "object" || !globalThis.tutorials) globalThis.tutorials = {};
+    globalThis.tutorials[def.id] = def.tutorial;
+  }
+  if (qa_is_browser()) {
+    if (QA_UI.installed) qa_render_counter(def);
+  }
+}
+
+function defineCounterAssociation(structureId, counterIds) {
+  if (!structureId || typeof structureId !== "string") throw new Error("defineCounterAssociation: missing/invalid structureId");
+  let ids = counterIds;
+  if (ids == null) ids = [];
+  if (typeof ids === "string") ids = [ids];
+  if (!Array.isArray(ids)) throw new Error("defineCounterAssociation: counterIds must be an array (or a string)");
+
+  // normalize + dedupe while preserving order
+  const seen = new Set();
+  const norm = [];
+  for (const id of ids) {
+    if (typeof id !== "string" || !id) continue;
+    if (!seen.has(id)) {
+      seen.add(id);
+      norm.push(id);
+    }
+  }
+
+  // Otherwise, treat as "add" (can be called multiple times).
+  const existing = QA_REG.counterAssociations.get(structureId) || [];
+  const merged = existing.slice();
+  const mergedSeen = new Set(existing);
+  for (const id of norm) {
+    if (!mergedSeen.has(id)) {
+      mergedSeen.add(id);
+      merged.push(id);
+    }
+  }
+  QA_REG.counterAssociations.set(structureId, merged);
+}
+
+createStructuresAndCounters();
+
+
+
+function makeBuildContext(text) {
+  return {
+    text,
+    _s: new Map(),
+    _c: new Map(),
+    getStructure(id) {
+      if (id === "text") return this.text; // special structure
+      if (this._s.has(id)) return this._s.get(id);
+      const def = QA_REG.structures.get(id);
+      if (!def) throw new Error("Unknown structure: " + id);
+      const depVals = def.deps.map(d => this.getStructure(d));
+      const val = def.compute(this, ...depVals);
+      this._s.set(id, val);
+      return val;
+    },
+    getCounter(id) {
+      if (this._c.has(id)) return this._c.get(id);
+      const def = QA_REG.counters.get(id);
+      if (!def) return undefined; // allow UI to show "not defined" for legacy counters
+      const depVals = def.deps.map(d => this.getStructure(d)); // counter deps are structures
+      const val = def.compute(this, ...depVals);
+      this._c.set(id, val);
+      return val;
+    },
+  };
+}
+// New build_ds signature:
+// request = { structures: string[], counters: string[] }
+function build_ds(text, request) {
+  const req = request || {};
+  const structures = Array.isArray(req.structures) ? req.structures : [];
+  const counters = Array.isArray(req.counters) ? req.counters : [];
+  const ctx = makeBuildContext(text);
+  const out = {};
+  // Structures
+  for (const id of structures) {
+    out[id] = ctx.getStructure(id);
+  }
+  // Counters => output key must stay "counter_<id>" because fill_updates expects that
+  for (const id of counters) {
+    const v = ctx.getCounter(id);
+    if (v !== undefined) out["counter_" + id] = v;
+  }
+  return out;
+}
+
 
 // Automatic counter selection (used by updateArrays() and fill_updates())
 function getEnabledIds(list) {

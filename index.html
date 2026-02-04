@@ -964,6 +964,28 @@ function defineStructure(def) {
   if (qa_is_browser()) {
     if (QA_UI.installed) qa_render_structure(def);
   }
+  
+  const autoCounterEnabled =
+    (typeof def.autoCounter !== "undefined" && def.autoCounter === true) ||
+    typeof def.autoCounter === "undefined";
+    
+  if (autoCounterEnabled) {
+    if (def.type === "string") {
+      defineCounter({
+        id: def.id,
+        displayHtml: "runs(" + (def.displayHtml || def.id) + ")",
+        deps: [def.id],
+        compute: (ctx, str) => number_of_runs(str)
+      });
+    } else if (def.type === "factorization") {
+      defineCounter({
+        id: def.id,
+        displayHtml: "size(" + (def.displayHtml || def.id) + ")",
+        deps: [def.id],
+        compute: (ctx, str) => number_of_runs(str)
+      });
+    }
+  }
 }
 
 function defineCounter(def) {
@@ -1738,12 +1760,6 @@ defineStructure({
 });
 // ---------------- Counter definitions ----------------
 defineCounter({
-  id: "text",
-  displayHtml: "T",
-  deps: [],
-  compute: (ctx) => number_of_runs(ctx.text)
-});
-defineCounter({
   id: "sigma",
   displayHtml: "σ",
   deps: [],
@@ -1784,108 +1800,6 @@ defineCounter({
   displayHtml: "max δ",
   deps: ["substring_complexity"],
   compute: (ctx, sc) => count_delta_argmax(sc)
-});
-defineCounter({
-  id: "bw_transform",
-  displayHtml: "BWT",
-  deps: ["bw_transform"],
-  compute: (ctx, bwt) => number_of_runs(bwt)
-});
-defineCounter({
-  id: "bbw_transform",
-  displayHtml: "BBWT",
-  deps: ["bbw_transform"],
-  compute: (ctx, bbwt) => number_of_runs(bbwt)
-});
-defineCounter({
-  id: "inverse_bbw_transform",
-  displayHtml: "BBWT⁻¹",
-  deps: ["inverse_bbw_transform"],
-  compute: (ctx, s) => number_of_runs(s)
-});
-defineCounter({
-  id: "gamma_factorization",
-  displayHtml: "Γ",
-  deps: ["gamma_factorization"],
-  compute: (ctx, f) => number_of_factors(f)
-});
-defineCounter({
-  id: "lz78_factorization",
-  displayHtml: "LZ78",
-  deps: ["lz78_factorization"],
-  compute: (ctx, f) => number_of_factors(f)
-});
-defineCounter({
-  id: "lzw_factorization",
-  displayHtml: "LZW",
-  deps: ["lzw_factorization"],
-  compute: (ctx, f) => number_of_factors(f)
-});
-defineCounter({
-  id: "lzend_factorization",
-  displayHtml: "LZend",
-  deps: ["lzend_factorization"],
-  compute: (ctx, f) => number_of_factors(f)
-});
-defineCounter({
-  id: "lzss_factorization",
-  displayHtml: "LZSS",
-  deps: ["lzss_factorization"],
-  compute: (ctx, f) => number_of_factors(f)
-});
-defineCounter({
-  id: "lz77_factorization",
-  displayHtml: "LZ77",
-  deps: ["lz77_factorization"],
-  compute: (ctx, f) => number_of_factors(f)
-});
-defineCounter({
-  id: "lzssno_factorization",
-  displayHtml: "LZSSno",
-  deps: ["lzssno_factorization"],
-  compute: (ctx, f) => number_of_factors(f)
-});
-defineCounter({
-  id: "reverse_lzss_factorization",
-  displayHtml: "rLZSS",
-  deps: ["reverse_lzss_factorization"],
-  compute: (ctx, f) => number_of_factors(f)
-});
-defineCounter({
-  id: "lexparse_factorization",
-  displayHtml: "LexParse",
-  deps: ["lexparse_factorization"],
-  compute: (ctx, f) => number_of_factors(f)
-});
-defineCounter({
-  id: "lyndon_factorization",
-  displayHtml: "LynF",
-  deps: ["lyndon_factorization"],
-  compute: (ctx, f) => number_of_factors(f)
-});
-defineCounter({
-  id: "necklace_factorization",
-  displayHtml: "NeckF",
-  deps: ["necklace_factorization"],
-  compute: (ctx, f) => number_of_factors(f)
-});
-defineCounter({
-  id: "invert_transform",
-  displayHtml: "invert_transform",
-  deps: ["invert_transform"],
-  compute: (ctx, s) => number_of_runs(s)
-});
-defineCounter({
-  id: "revert_transform",
-  displayHtml: "revert_transform",
-  deps: ["revert_transform"],
-  compute: (ctx, s) => number_of_runs(s)
-});
-defineCounter({
-  id: "necklace_conjugate_transform",
-  displayHtml: "necklace_conjugate_transform",
-  deps: ["necklace_conjugate_transform"],
-  compute: (ctx, s) => number_of_runs(s)
 });
 // Automatic counter selection (used by updateArrays() and fill_updates())
 function getEnabledIds(list) {

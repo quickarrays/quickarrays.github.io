@@ -383,13 +383,13 @@ body {
       
       <div id="qa-structures-disabled-string" class="qa-itemlist-disabled">
         <div class="qa-itemlist-header">
-          <span class="qa-itemlist-title">Strings<span class="qa-itemlist-colon">:</span></span>
+          <span class="qa-itemlist-title">String transforms<span class="qa-itemlist-colon">:</span></span>
           <button type="button" class="qa-toggle-btn" aria-expanded="true">(hide)</button>
         </div>
       </div>
       <div id="qa-structures-disabled-index" class="qa-itemlist-disabled">
         <div class="qa-itemlist-header">
-          <span class="qa-itemlist-title">Index arrays<span class="qa-itemlist-colon">:</span></span>
+          <span class="qa-itemlist-title">Index permutations<span class="qa-itemlist-colon">:</span></span>
           <button type="button" class="qa-toggle-btn" aria-expanded="true">(hide)</button>
         </div>
       </div>
@@ -402,6 +402,12 @@ body {
       <div id="qa-structures-disabled-factor" class="qa-itemlist-disabled">
         <div class="qa-itemlist-header">
           <span class="qa-itemlist-title">Factorizations<span class="qa-itemlist-colon">:</span></span>
+          <button type="button" class="qa-toggle-btn" aria-expanded="true">(hide)</button>
+        </div>
+      </div>
+      <div id="qa-structures-disabled-other" class="qa-itemlist-disabled">
+        <div class="qa-itemlist-header">
+          <span class="qa-itemlist-title">Other<span class="qa-itemlist-colon">:</span></span>
           <button type="button" class="qa-toggle-btn" aria-expanded="true">(hide)</button>
         </div>
       </div>
@@ -1112,7 +1118,7 @@ defineStructure({
   id: "nss_array",
   displayHtml: "NSS",
   tooltip: "Next Smaller Suffix Array",
-  type: "index",
+  type: "other",
   deps: ["inverse_suffix_array"],
   compute: (ctx, isa) => {
     const t = isa;
@@ -1132,7 +1138,7 @@ defineStructure({
   id: "pss_array",
   displayHtml: "PSS",
   tooltip: "Previous Smaller Suffix Array",
-  type: "index",
+  type: "other",
   deps: ["inverse_suffix_array"],
   compute: (ctx, isa) => {
     const t = isa;
@@ -1794,6 +1800,7 @@ const QA_STRUCTURE_TYPE_CLASS = {
   index: "qa-structure-index",
   length: "qa-structure-length",
   factorization: "qa-structure-factor",
+  other: "qa-structure-other",
 };
 
 function qa_make_item(kind, def) {
@@ -1834,6 +1841,7 @@ function qa_install_ui_if_possible() {
     index: document.getElementById("qa-structures-disabled-index"),
     length: document.getElementById("qa-structures-disabled-length"),
     factorization: document.getElementById("qa-structures-disabled-factor"),
+    other: document.getElementById("qa-structures-disabled-other"),
   };
   QA_UI.countersEnabled = document.getElementById("qa-counter-enabled");
   QA_UI.countersDisabled = document.getElementById("qa-counter-disabled");
@@ -1854,7 +1862,7 @@ function qa_render_structure(def) {
   if (!qa_should_render_as_structure(def)) return;
   if (def._el) return;
   const t = def.type;
-  if (!t || !QA_UI.structuresDisabled[t]) throw new Error("Structure '" + def.id + "' missing/invalid type (string|index|length|factorization)");
+  if (!t || !QA_UI.structuresDisabled[t]) throw new Error("Structure '" + def.id + "' missing/invalid type (string|index|length|factorization|other)");
   def._el = qa_make_item("structure", def);
   const parent = def.enabledByDefault ? QA_UI.structuresEnabled : QA_UI.structuresDisabled[t];
   if (parent) parent.appendChild(def._el);
@@ -2517,7 +2525,19 @@ class DataStructureList {
     } : e || {}, this.defaultDisParent = this.disParents.all || this.disParents.index || this.disParents.length || this.disParents.string || this.disParents.factor || t, this.onChange = n, this.enableDblClick = r
   }
   getDisabledParent(t) {
-    return t ? (t.classList.contains("qa-structure-string") && this.disParents.string ? this.disParents.string : t.classList.contains("qa-structure-index") && this.disParents.index ? this.disParents.index : t.classList.contains("qa-structure-length") && this.disParents.length ? this.disParents.length : t.classList.contains("qa-structure-factor") && this.disParents.factor ? this.disParents.factor : this.defaultDisParent) : this.defaultDisParent
+    return t
+      ? (t.classList.contains("qa-structure-string") && this.disParents.string
+          ? this.disParents.string
+          : t.classList.contains("qa-structure-index") && this.disParents.index
+          ? this.disParents.index
+          : t.classList.contains("qa-structure-length") && this.disParents.length
+          ? this.disParents.length
+          : t.classList.contains("qa-structure-factor") && this.disParents.factor
+          ? this.disParents.factor
+          : t.classList.contains("qa-structure-other") && this.disParents.other
+          ? this.disParents.other
+          : this.defaultDisParent)
+      : this.defaultDisParent;
   }
   add(t) {
     this.dictionary[t.dataset.ds] = t;
@@ -2547,6 +2567,8 @@ DataStructureList.prototype.getEnabled = function() {
   return this.dictionary[t] && this.dictionary[t].classList.contains("qa-structure-string")
 }, DataStructureList.prototype.isFactorization = function(t) {
   return this.dictionary[t] && this.dictionary[t].classList.contains("qa-structure-factor")
+}, DataStructureList.prototype.isOther = function(t) {
+  return this.dictionary[t] && this.dictionary[t].classList.contains("qa-structure-other")
 }, DataStructureList.prototype.forEachEnabled = function(t) {
   for (var e = this.enParent.getElementsByClassName("qa-structure"), n = 0; n < e.length; n++) {
     var r = e[n].dataset.ds;
@@ -2696,7 +2718,7 @@ function update_history_internal() {
     if (advOn !== advDefault) t = t.set("adv", advOn ? "1" : "0");
   }
   const hidden = [];
-  ["qa-structures-enabled", "qa-structures-disabled-string", "qa-structures-disabled-index", "qa-structures-disabled-length", "qa-structures-disabled-factor"].forEach((id) => {
+  ["qa-structures-enabled", "qa-structures-disabled-string", "qa-structures-disabled-index", "qa-structures-disabled-length", "qa-structures-disabled-factor", "qa-structures-disabled-other"].forEach((id) => {
     const el = document.getElementById(id);
     if (!el) return;
     const btn = el.querySelector(".qa-toggle-btn");
@@ -2960,7 +2982,8 @@ function initDragAndDrop(t, e) {
       "qa-structures-disabled-string": "qa-structure-string",
       "qa-structures-disabled-index": "qa-structure-index",
       "qa-structures-disabled-length": "qa-structure-length",
-      "qa-structures-disabled-factor": "qa-structure-factor"
+      "qa-structures-disabled-factor": "qa-structure-factor",
+      "qa-structures-disabled-other": "qa-structure-other"
     };
 
   function i(t) {
@@ -3049,14 +3072,25 @@ window.onload = function() {
       string: document.getElementById("qa-structures-disabled-string"),
       index: document.getElementById("qa-structures-disabled-index"),
       length: document.getElementById("qa-structures-disabled-length"),
-      factor: document.getElementById("qa-structures-disabled-factor")
+      factor: document.getElementById("qa-structures-disabled-factor"),
+      other: document.getElementById("qa-structures-disabled-other"),
     };
   ! function() {
     const t = document.getElementById("qa-structures-disabled-source");
     if (!t) return;
     const n = Array.from(t.querySelectorAll(".qa-structure"));
     n.forEach(t => {
-      t.classList.contains("qa-structure-string") ? e.string.appendChild(t) : t.classList.contains("qa-structure-index") ? e.index.appendChild(t) : t.classList.contains("qa-structure-length") ? e.length.appendChild(t) : t.classList.contains("qa-structure-factor") ? e.factor.appendChild(t) : e.index.appendChild(t)
+      t.classList.contains("qa-structure-string")
+        ? e.string.appendChild(t)
+        : t.classList.contains("qa-structure-index")
+        ? e.index.appendChild(t)
+        : t.classList.contains("qa-structure-length")
+        ? e.length.appendChild(t)
+        : t.classList.contains("qa-structure-factor")
+        ? e.factor.appendChild(t)
+        : t.classList.contains("qa-structure-other")
+        ? e.other.appendChild(t)
+        : e.other.appendChild(t);
     }), t.remove()
   }();
   const n = document.getElementById("qa-counter-enabled"),
@@ -3122,7 +3156,8 @@ window.onload = function() {
   setupShowHide('qa-structures-disabled-string', true);
   setupShowHide('qa-structures-disabled-index', true);
   setupShowHide('qa-structures-disabled-length', true);
-  setupShowHide('qa-structures-disabled-factor', true)
+  setupShowHide('qa-structures-disabled-factor', true);
+  setupShowHide('qa-structures-disabled-other', true);
 };
   </script>
   
@@ -3191,7 +3226,8 @@ window.onload = function() {
         'qa-structures-disabled-string',
         'qa-structures-disabled-index',
         'qa-structures-disabled-length',
-        'qa-structures-disabled-factor'
+        'qa-structures-disabled-factor',
+        'qa-structures-disabled-other'
       ];
 
 function structureGroup(el) {
@@ -3200,12 +3236,13 @@ function structureGroup(el) {
         if (el.classList.contains('qa-structure-index')) return 'index';
         if (el.classList.contains('qa-structure-length')) return 'length';
         if (el.classList.contains('qa-structure-factor')) return 'factor';
+        if (el.classList.contains('qa-structure-other')) return 'other';
         return 'other';
       }
 
       const GROUP_TITLES = {
-        string: 'Strings',
-        index: 'Index arrays',
+        string: 'String transforms',
+        index: 'Index permutations',
         length: 'Length arrays',
         factor: 'Factorizations',
         other: 'Other'

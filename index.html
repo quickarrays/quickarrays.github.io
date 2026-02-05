@@ -170,9 +170,12 @@ body {
   cursor: move;
   cursor: -webkit-grabbing;
   border: 1px solid #9b9;
+  border: 1px solid #000;
+  border-radius: .25em;
   flex-shrink: 0;
   margin: .25em;
-  padding: .2em;
+  padding: .25em;
+  padding-inline: .5em;
   min-width: 3em;
   text-align: center;
 }
@@ -497,10 +500,110 @@ const createStructuresAndCounters = function () {
 defineStructure({
   id: "text",
   displayHtml: "T",
+  tooltip: "The Text",
   type: "string",
   stringtype: "structure-only",
   deps: [],
   compute: (ctx) => ctx.text
+});
+
+defineStructure({
+  id: "invert_transform",
+  displayHtml: "inv(T)",
+  transformDisplayHtml: "Invert",
+  tooltip: "Symbol-wise Inversion of Text",
+  type: "string",
+  deps: [],
+  autoCounter: false,
+  compute: (ctx) => {
+    const t = ctx.text;
+    const chars = [...t];
+    const alphabet = [...new Set(chars)].sort((a, b) => a.codePointAt(0) - b.codePointAt(0));
+    const idx = new Map(alphabet.map((ch, i) => [ch, i]));
+    const L = alphabet.length;
+    return chars
+      .map(ch => alphabet[L - 1 - idx.get(ch)])
+      .join("");
+  }
+});
+
+defineStructure({
+  id: "revert_transform",
+  displayHtml: "rev(T)",
+  transformDisplayHtml: "Revert",
+  tooltip: "Reversal of Text",
+  type: "string",
+  deps: [],
+  autoCounter: false,
+  compute: (ctx) => {
+    const t = ctx.text;
+    return t ? t.split("").reverse().join("") : ""
+  }
+});
+
+defineStructure({
+  id: "necklace_conjugate_transform",
+  displayHtml: "Necklace Conjugate",
+  displayHtml: "min-rot(T)",
+  transformDisplayHtml: "Necklace Conjugate (minimal rotation)",
+  tooltip: "Lexicographically Minimal Rotation",
+  type: "string",
+  deps: [],
+  compute: (ctx) => construct_necklace_conjugate_transform(ctx.text)
+});
+
+defineStructure({
+  id: "first_array",
+  displayHtml: "F",
+  transformDisplayHtml: "F (sorted text)",
+  tooltip: "First Column Array",
+  type: "string",
+  autoCounter: false,
+  deps: [],
+  compute: (ctx) => construct_first_array(ctx.text)
+});
+
+defineStructure({
+  id: "bw_transform",
+  displayHtml: "BWT",
+  tooltip: "Burrows-Wheeler Transform",
+  type: "string",
+  deps: ["rotation_array"],
+  compute: (ctx, rot) => {
+    const t = ctx.text;
+    const e = rot;
+    if (!t) return "";
+    if (t.length !== e.length) throw new AlgorithmError("Invalid input: text must be a string and rotation_array must be an array", "BWT", {
+      text: t,
+      rotation_array: e
+    });
+    const n = t.length;
+    let r = "";
+    for (let i = 0; i < n; i++) r += t[(e[i] + n - 1) % n];
+    return r
+  }
+});
+
+defineStructure({
+  id: "bbw_transform",
+  displayHtml: "BBWT",
+  tooltip: "Bijective Burrows-Wheeler Transform",
+  type: "string",
+  deps: ["bbw_indices"],
+  compute: (ctx, idx) => {
+    const t = ctx.text;
+    const e = idx;
+    return t && e ? [...e].map(e => t[e]).join("") : ""
+  }
+});
+
+defineStructure({
+  id: "inverse_bbw_transform",
+  displayHtml: "BBWT⁻¹",
+  tooltip: "Inverse Bijective Burrows-Wheeler Transform",
+  type: "string",
+  deps: ["bbw_transform"],
+  compute: (ctx, bbwt) => construct_inverse_bbw_transform(bbwt)
 });
 
 defineStructure({
@@ -561,15 +664,6 @@ defineStructure({
 });
 
 defineStructure({
-  id: "first_array",
-  displayHtml: "F",
-  tooltip: "First Column Array",
-  type: "string",
-  deps: [],
-  compute: (ctx) => construct_first_array(ctx.text)
-});
-
-defineStructure({
   id: "rotation_array",
   displayHtml: "Rot",
   tooltip: "Rotation Array",
@@ -605,41 +699,7 @@ defineStructure({
   }
 });
 
-defineStructure({
-  id: "invert_transform",
-  displayHtml: "Invert",
-  type: "string",
-  deps: [],
-  compute: (ctx) => {
-    const t = ctx.text;
-    const chars = [...t];
-    const alphabet = [...new Set(chars)].sort((a, b) => a.codePointAt(0) - b.codePointAt(0));
-    const idx = new Map(alphabet.map((ch, i) => [ch, i]));
-    const L = alphabet.length;
-    return chars
-      .map(ch => alphabet[L - 1 - idx.get(ch)])
-      .join("");
-  }
-});
 
-defineStructure({
-  id: "revert_transform",
-  displayHtml: "Revert",
-  type: "string",
-  deps: [],
-  compute: (ctx) => {
-    const t = ctx.text;
-    return t ? t.split("").reverse().join("") : ""
-  }
-});
-
-defineStructure({
-  id: "necklace_conjugate_transform",
-  displayHtml: "Necklace Conjugate",
-  type: "string",
-  deps: [],
-  compute: (ctx) => construct_necklace_conjugate_transform(ctx.text)
-});
 
 defineStructure({
   id: "lcp_array",
@@ -694,27 +754,6 @@ defineStructure({
     let i = 0;
     for (let t = e; t >= 1; --t) i += 1, r.has(t) && (i -= r.get(t)), n[t - 1] = i;
     return n
-  }
-});
-
-defineStructure({
-  id: "bw_transform",
-  displayHtml: "BWT",
-  tooltip: "Burrows-Wheeler Transform",
-  type: "string",
-  deps: ["rotation_array"],
-  compute: (ctx, rot) => {
-    const t = ctx.text;
-    const e = rot;
-    if (!t) return "";
-    if (t.length !== e.length) throw new AlgorithmError("Invalid input: text must be a string and rotation_array must be an array", "BWT", {
-      text: t,
-      rotation_array: e
-    });
-    const n = t.length;
-    let r = "";
-    for (let i = 0; i < n; i++) r += t[(e[i] + n - 1) % n];
-    return r
   }
 });
 
@@ -1210,27 +1249,6 @@ defineStructure({
 });
 
 defineStructure({
-  id: "bbw_transform",
-  displayHtml: "BBWT",
-  tooltip: "Bijective Burrows-Wheeler Transform",
-  type: "string",
-  deps: ["bbw_indices"],
-  compute: (ctx, idx) => {
-    const t = ctx.text;
-    const e = idx;
-    return t && e ? [...e].map(e => t[e]).join("") : ""
-  }
-});
-
-defineStructure({
-  id: "inverse_bbw_transform",
-  displayHtml: "BBWT⁻¹",
-  tooltip: "Inverse Bijective Burrows-Wheeler Transform",
-  type: "string",
-  deps: ["bbw_transform"],
-  compute: (ctx, bbwt) => construct_inverse_bbw_transform(bbwt)
-});
-defineStructure({
   id: "lexparse_factorization",
   displayHtml: "LexParse",
   tooltip: "Lexicographic Parse Factorization",
@@ -1302,6 +1320,11 @@ defineCounter({
 
 // Counter associations
 defineCounterAssociation("text", ["text", "sigma"]);
+defineCounterAssociation("invert_transform", ["text", "sigma"]);
+defineCounterAssociation("revert_transform", ["text", "sigma"]);
+defineCounterAssociation("necklace_conjugate_transform", ["sigma"]);
+defineCounterAssociation("bw_transform", ["sigma"]);
+defineCounterAssociation("first_array", ["sigma"]);
 defineCounterAssociation("border_array", ["period", "exponent", "regularity"]);
 defineCounterAssociation("lcp_array", ["sum_of_lcp_array", "delta", "delta_argmax"]);
 defineCounterAssociation("substring_complexity", ["delta", "delta_argmax"]); 

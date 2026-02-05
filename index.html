@@ -3194,9 +3194,13 @@ window.onload = function() {
   }), counters_default = counters_list.getEnabled(), options_list = new OptionList(updateArrays), document.querySelectorAll(".qa-option-cbx").forEach(t => {
     options_list.add(t)
   }), options_default = options_list.getEnabled(), initDragAndDrop([t, e.string, e.index, e.length, e.factor]), initDragAndDrop(n, r), load_history_internal(), qa_tutorial_open_selected_button && (qa_tutorial_open_selected_button.onclick = function() {
+    if (qa_tutorial_select && qa_tutorial_select.selectedIndex >= 0) {
+      update_tutorial(
+        qa_tutorial_select.value,
+        qa_tutorial_select.options[qa_tutorial_select.selectedIndex].textContent
+      );
+    }
     qa_tutorial_overlay.style.display = "block"
-  }), qa_tutorial_select && (qa_tutorial_select.onchange = function() {
-    update_tutorial(qa_tutorial_select.value, qa_tutorial_select.options[qa_tutorial_select.selectedIndex].textContent)
   }), qa_populate_tutorial_select(), qa_tutorial_close_button.onclick = function() {
     qa_tutorial_overlay.style.display = "none"
   }, window.onclick = function(t) {

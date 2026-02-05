@@ -1328,7 +1328,9 @@ defineCounter({
   displayHtml: "σ",
   tooltip: "Number of distinct characters in T",
   deps: [],
-  compute: (ctx) => count_sigma(ctx.text)
+  compute: function count_sigma(ctx) {
+    return ctx.text ? new Set(ctx.text).size : 0;
+  }
 });
 
 defineCounter({
@@ -1336,23 +1338,35 @@ defineCounter({
   displayHtml: "p",
   tooltip: "Minimal period of T",
   deps: ["border_array"],
-  compute: (ctx, b) => count_period(b)
+  compute: (ctx, t) => {
+  if (!t || 0 === t.length) return 0;
+    const e = t[t.length - 1];
+    return t.length - e
+  }
 });
 
 defineCounter({
   id: "exponent",
   displayHtml: "e",
   tooltip: "Exponent of T",
-  deps: ["border_array"],
-  compute: (ctx, b) => count_exponent(b)
+  deps: ["border_array", "period"],
+  compute: (ctx, t, p) => {
+    if (!t || 0 === t.length) return 0;
+    return t.length / p
+  }
 });
 
 defineCounter({
   id: "regularity",
   displayHtml: "R",
   tooltip: "Regularity (square, non-primitive, unbordered, or primitive)",
-  deps: ["border_array"],
-  compute: (ctx, b) => count_regularity(b)
+  deps: ["border_array", "period", "exponent"],
+  compute: (ctx, t, r, i) => {
+    if (!t || 0 === t.length) return "empty";
+    const e = t.length,
+      n = t[e - 1];
+    return i > 1 && e % r == 0 ? 2 == i ? "square" : "non-primitive" : 0 == n ? "unbordered" : "primitive"
+  }
 });
 
 defineCounter({
@@ -1531,31 +1545,6 @@ class AlgorithmError extends Error {
   constructor(t, e, n) {
     super(t), this.algorithm = e, this.input = n, this.name = "AlgorithmError"
   }
-}
-
-function count_sigma(t) {
-  return t ? new Set(t).size : 0
-}
-
-function count_period(t) {
-  if (!t || 0 === t.length) return 0;
-  const e = t[t.length - 1];
-  return t.length - e
-}
-
-function count_exponent(t) {
-  if (!t || 0 === t.length) return 0;
-  const e = count_period(t);
-  return t.length / e
-}
-
-function count_regularity(t) {
-  if (!t || 0 === t.length) return "empty";
-  const e = t.length,
-    n = t[e - 1],
-    r = count_period(t),
-    i = count_exponent(t);
-  return i > 1 && e % r == 0 ? 2 == i ? "square" : "non-primitive" : 0 == n ? "unbordered" : "primitive"
 }
 
 function construct_first_array(t) {
@@ -2030,7 +2019,7 @@ function defineStructure(def) {
   if (autoCounterEnabled) {
     if (def.type === "string") {
       defineCounter({
-        id: def.id,
+        id: def.id + "_runs",
         displayHtml: "runs(" + (def.displayHtml || def.id) + ")",
         tooltip: "Number of runs in " + (def.displayHtml || def.id),
         deps: [def.id],
@@ -2039,7 +2028,7 @@ function defineStructure(def) {
       defineCounterAssociation(def.id, def.id);
     } else if (def.type === "factorization") {
       defineCounter({
-        id: def.id,
+        id: def.id + "_size",
         displayHtml: "size(" + (def.displayHtml || def.id) + ")",
         tooltip: "Number of factors in " + (def.displayHtml || def.id),
         deps: [def.id],
@@ -2111,7 +2100,9 @@ function makeBuildContext(text) {
       if (this._s.has(id)) return this._s.get(id);
       const def = QA_REG.structures.get(id);
       if (!def) throw new Error("Unknown structure: " + id);
-      const depVals = def.deps.map(d => this.getStructure(d));
+      const depVals = def.deps.map(d =>
+        QA_REG.counters.has(d) ? this.getCounter(d) : this.getStructure(d)
+      );
       const val = def.compute(this, ...depVals);
       this._s.set(id, val);
       return val;
@@ -2120,7 +2111,9 @@ function makeBuildContext(text) {
       if (this._c.has(id)) return this._c.get(id);
       const def = QA_REG.counters.get(id);
       if (!def) return undefined; // allow UI to show "not defined" for legacy counters
-      const depVals = def.deps.map(d => this.getStructure(d)); // counter deps are structures
+      const depVals = def.deps.map(d =>
+        QA_REG.counters.has(d) ? this.getCounter(d) : this.getStructure(d)
+      );
       const val = def.compute(this, ...depVals);
       this._c.set(id, val);
       return val;

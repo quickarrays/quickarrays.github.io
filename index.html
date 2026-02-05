@@ -136,7 +136,7 @@ body {
 
 .qa-description {
   margin-top: 1em;
-  margin-left: .5em;
+  margin-left: .25em;
   font-weight: 700
 }
 
@@ -270,13 +270,28 @@ body {
 }
 
 #qa-tutorial-box {
+  box-sizing: border-box;
   background-color: #fff;
   border: 1px solid #888;
-  width: 50%;
-  margin: 15% auto;
-  padding: 20px;
+  width: calc(1680px - 2em);
+  margin: 5em auto;
+  padding: 1em;
   position: relative;
   box-shadow: 0 4px 8px #0003
+}
+
+@media (width<=1680px) {
+  #qa-tutorial-box {
+    width: calc(100% - 2em);
+    margin: 4em auto;
+  }
+}
+
+@media (width<=640px) {
+  #qa-tutorial-box {
+    width: 100%;
+    margin: 0em;
+  }
 }
 
 #qa-tutorial-close-button {
@@ -292,13 +307,31 @@ body {
 }
 
 .qa-tutorial-controls {
-  display: none;
+  display: inline-flex;
   align-items: center;
   gap: .5em;
 }
 
 #qa-tutorial-select {
   min-width: 14em;
+}
+
+.qa-description:has(#qa-tutorial-controls){
+  display:flex;
+  flex-direction:row-reverse;
+  align-items:bottom;
+  flex-wrap:wrap;
+  gap:.5em;
+  margin-top:0em;
+}
+
+.qa-description:has(#qa-tutorial-controls) #qa-tutorial-controls{
+  margin-left:auto;
+}
+
+.qa-description:has(#qa-tutorial-controls) #qa-enter-string-prompt{
+  margin-right:auto;
+  margin-top:1.5em;
 }
 
 .qa-toggle-btn {
@@ -349,24 +382,29 @@ body {
   </div>
   <div class=qa-main>
     <div class=qa-description>
-      <label for=qa-generate-string-list>Enter your text below or generate it:</label>
-      <select id=qa-generate-string-list name=qa-generate-string-list>
-        <option value=custom selected>Custom</option>
-      </select>
-      <span id=qa-generate-string-span class=qa-hidden>
-      <label for=qa-generate-string-range>Length limit:</label>
-      <input type=range id=qa-generate-string-range name=qa-generate-string-range min=1 max=1024 value=168 step=1>
-      <span id=qa-generate-string-rank>16</span>
-      </span>      <span id="qa-tutorial-controls" class="qa-tutorial-controls">
+      <span id="qa-tutorial-controls" class="qa-tutorial-controls">
         <label for="qa-tutorial-select">Tutorial:</label>
         <select id="qa-tutorial-select"></select>
         <button id="qa-tutorial-open-selected" type="button">Open</button>
       </span>
-</div>
+      <div id="qa-enter-string-prompt">
+        <label for=qa-generate-string-list>Enter your text below or generate it:</label>
+        <select id=qa-generate-string-list name=qa-generate-string-list>
+          <option value=custom selected>Custom</option>
+        </select>
+      </div>
+    </div>
+    <div class=qa-itemlist id=qa-generate-string-span class=qa-hidden>
+      <div>
+        <label for=qa-generate-string-range>Length:</label>
+        <input type=range id=qa-generate-string-range name=qa-generate-string-range min=1 max=1024 value=168 step=1>
+        <span id=qa-generate-string-rank>16</span>
+      </div>
+    </div>
     <textarea class=qa-textarea id=qa-text placeholder=MISSISSIPPI></textarea>
-    <div class=qa-itemlist>
+    <div class=qa-description>
       <div class=div>
-        <label for=qa-transform-list>Text Transforms:</label>
+        <label for=qa-transform-list>Apply transform:</label>
         <select id=qa-transform-list name=qa-transform-list>
           <option value=none>None</option>
           <option value=custom>Custom</option>
@@ -3063,7 +3101,7 @@ function qa_populate_tutorial_select() {
 function update_tutorial(t, e) {
   if (void 0 === tutorials[t]) return;
   const n = tutorials[t];
-  qa_tutorial_title.innerHTML = n.title, qa_tutorial_content.innerHTML = n.content, "undefined" != typeof MathJax && MathJax.typeset([qa_tutorial_content]), void 0 !== n.oeis ? (qa_tutorial_oeis.style.display = "block", qa_tutorial_oeis.innerHTML = "Converges to OEIS sequence " + n.oeis, qa_tutorial_oeis.href = "https://oeis.org/" + n.oeis) : qa_tutorial_oeis.style.display = "none", void 0 !== n.cite ? (qa_tutorial_cite.style.display = "block", qa_tutorial_cite.href = n.cite, void 0 !== citations && "undefined" !== citations[n.cite] && (qa_tutorial_cite.innerHTML = citations[n.cite])) : qa_tutorial_cite.style.display = "none", void 0 !== n.wikipedia ? (qa_tutorial_wikipedia.style.display = "block", qa_tutorial_wikipedia.innerHTML = "Wikipedia Article about " + e, qa_tutorial_wikipedia.href = "https://en.wikipedia.org/wiki/" + n.wikipedia) : qa_tutorial_wikipedia.style.display = "none", qa_tutorial_controls && (qa_tutorial_controls.style.display = "inline-flex"); qa_populate_tutorial_select(); qa_tutorial_select && (qa_tutorial_select.value = t)
+  qa_tutorial_title.innerHTML = n.title, qa_tutorial_content.innerHTML = n.content, "undefined" != typeof MathJax && MathJax.typeset([qa_tutorial_content]), void 0 !== n.oeis ? (qa_tutorial_oeis.style.display = "block", qa_tutorial_oeis.innerHTML = "Converges to OEIS sequence " + n.oeis, qa_tutorial_oeis.href = "https://oeis.org/" + n.oeis) : qa_tutorial_oeis.style.display = "none", void 0 !== n.cite ? (qa_tutorial_cite.style.display = "block", qa_tutorial_cite.href = n.cite, void 0 !== citations && "undefined" !== citations[n.cite] && (qa_tutorial_cite.innerHTML = citations[n.cite])) : qa_tutorial_cite.style.display = "none", void 0 !== n.wikipedia ? (qa_tutorial_wikipedia.style.display = "block", qa_tutorial_wikipedia.innerHTML = "Wikipedia Article about " + e, qa_tutorial_wikipedia.href = "https://en.wikipedia.org/wiki/" + n.wikipedia) : qa_tutorial_wikipedia.style.display = "none"; qa_populate_tutorial_select(); qa_tutorial_select && (qa_tutorial_select.value = t)
 }
 window.onload = function() {
   qa_install_ui_if_possible();

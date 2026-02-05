@@ -291,6 +291,16 @@ body {
   display: none
 }
 
+.qa-tutorial-controls {
+  display: none;
+  align-items: center;
+  gap: .5em;
+}
+
+#qa-tutorial-select {
+  min-width: 14em;
+}
+
 .qa-toggle-btn {
   margin-left: 0em;
   padding: 0em;
@@ -347,9 +357,12 @@ body {
       <label for=qa-generate-string-range>Length limit:</label>
       <input type=range id=qa-generate-string-range name=qa-generate-string-range min=1 max=1024 value=168 step=1>
       <span id=qa-generate-string-rank>16</span>
+      </span>      <span id="qa-tutorial-controls" class="qa-tutorial-controls">
+        <label for="qa-tutorial-select">Tutorial:</label>
+        <select id="qa-tutorial-select"></select>
+        <button id="qa-tutorial-open-selected" type="button">Open</button>
       </span>
-      <button id=qa-tutorial-open-button></button>
-    </div>
+</div>
     <textarea class=qa-textarea id=qa-text placeholder=MISSISSIPPI></textarea>
     <div class=qa-itemlist>
       <div class=div>
@@ -2921,7 +2934,7 @@ function fill_updates(t) {
 }
 var qa_worker = null,
   qa_is_loaded = !1,
-  qa_tutorial_open_button, qa_tutorial_close_button, qa_tutorial_overlay, qa_tutorial_title, qa_tutorial_content, qa_tutorial_oeis, qa_tutorial_cite, qa_tutorial_wikipedia, qa_output_select, qa_timeout_range, qa_timeout_value, qa_computation_status;
+  qa_tutorial_controls, qa_tutorial_select, qa_tutorial_open_selected_button, qa_tutorial_open_button, qa_tutorial_close_button, qa_tutorial_overlay, qa_tutorial_title, qa_tutorial_content, qa_tutorial_oeis, qa_tutorial_cite, qa_tutorial_wikipedia, qa_output_select, qa_timeout_range, qa_timeout_value, qa_computation_status;
 
 var update_requested = !1;
 
@@ -3021,14 +3034,42 @@ function initDragAndDrop(t, e) {
   }
 }
 
+function qa_html_to_text(t) {
+  const e = document.createElement("div");
+  return e.innerHTML = t, (e.textContent || e.innerText || "").trim()
+}
+
+function qa_populate_tutorial_select() {
+  if (!qa_tutorial_select) return;
+  const t = Object.keys(tutorials || {});
+  if (0 === t.length) return;
+  t.sort((t, e) => {
+    const n = tutorials[t] && tutorials[t].title ? qa_html_to_text(tutorials[t].title) : t,
+      r = tutorials[e] && tutorials[e].title ? qa_html_to_text(tutorials[e].title) : e;
+    return n.localeCompare(r)
+  });
+  const e = qa_tutorial_select.value;
+  qa_tutorial_select.innerHTML = "";
+  for (const n of t) {
+    const t = document.createElement("option");
+    t.value = n;
+    const e = tutorials[n] && tutorials[n].title ? qa_html_to_text(tutorials[n].title) : n;
+    t.textContent = e;
+    qa_tutorial_select.appendChild(t)
+  }
+  e && (qa_tutorial_select.value = e)
+}
+
 function update_tutorial(t, e) {
   if (void 0 === tutorials[t]) return;
   const n = tutorials[t];
-  qa_tutorial_title.innerHTML = n.title, qa_tutorial_content.innerHTML = n.content, "undefined" != typeof MathJax && MathJax.typeset([qa_tutorial_content]), void 0 !== n.oeis ? (qa_tutorial_oeis.style.display = "block", qa_tutorial_oeis.innerHTML = "Converges to OEIS sequence " + n.oeis, qa_tutorial_oeis.href = "https://oeis.org/" + n.oeis) : qa_tutorial_oeis.style.display = "none", void 0 !== n.cite ? (qa_tutorial_cite.style.display = "block", qa_tutorial_cite.href = n.cite, void 0 !== citations && "undefined" !== citations[n.cite] && (qa_tutorial_cite.innerHTML = citations[n.cite])) : qa_tutorial_cite.style.display = "none", void 0 !== n.wikipedia ? (qa_tutorial_wikipedia.style.display = "block", qa_tutorial_wikipedia.innerHTML = "Wikipedia Article about " + e, qa_tutorial_wikipedia.href = "https://en.wikipedia.org/wiki/" + n.wikipedia) : qa_tutorial_wikipedia.style.display = "none", qa_tutorial_open_button.innerHTML = "Tell me more about <b>" + e + "</b>!", qa_tutorial_open_button.style.display = "inline-block"
+  qa_tutorial_title.innerHTML = n.title, qa_tutorial_content.innerHTML = n.content, "undefined" != typeof MathJax && MathJax.typeset([qa_tutorial_content]), void 0 !== n.oeis ? (qa_tutorial_oeis.style.display = "block", qa_tutorial_oeis.innerHTML = "Converges to OEIS sequence " + n.oeis, qa_tutorial_oeis.href = "https://oeis.org/" + n.oeis) : qa_tutorial_oeis.style.display = "none", void 0 !== n.cite ? (qa_tutorial_cite.style.display = "block", qa_tutorial_cite.href = n.cite, void 0 !== citations && "undefined" !== citations[n.cite] && (qa_tutorial_cite.innerHTML = citations[n.cite])) : qa_tutorial_cite.style.display = "none", void 0 !== n.wikipedia ? (qa_tutorial_wikipedia.style.display = "block", qa_tutorial_wikipedia.innerHTML = "Wikipedia Article about " + e, qa_tutorial_wikipedia.href = "https://en.wikipedia.org/wiki/" + n.wikipedia) : qa_tutorial_wikipedia.style.display = "none", qa_tutorial_controls && (qa_tutorial_controls.style.display = "inline-flex"); qa_populate_tutorial_select(); qa_tutorial_select && (qa_tutorial_select.value = t)
 }
 window.onload = function() {
   qa_install_ui_if_possible();
-  qa_tutorial_open_button = document.getElementById("qa-tutorial-open-button");
+  qa_tutorial_controls = document.getElementById("qa-tutorial-controls");
+  qa_tutorial_select = document.getElementById("qa-tutorial-select");
+  qa_tutorial_open_selected_button = document.getElementById("qa-tutorial-open-selected");
   qa_tutorial_close_button = document.getElementById("qa-tutorial-close-button");
   qa_tutorial_overlay = document.getElementById("qa-tutorial-overlay");
   qa_tutorial_title = document.getElementById("qa-tutorial-title");
@@ -3114,13 +3155,15 @@ window.onload = function() {
     counters_list.add(t)
   }), counters_default = counters_list.getEnabled(), options_list = new OptionList(updateArrays), document.querySelectorAll(".qa-option-cbx").forEach(t => {
     options_list.add(t)
-  }), options_default = options_list.getEnabled(), initDragAndDrop([t, e.string, e.index, e.length, e.factor]), initDragAndDrop(n, r), load_history_internal(), qa_tutorial_open_button.onclick = function() {
+  }), options_default = options_list.getEnabled(), initDragAndDrop([t, e.string, e.index, e.length, e.factor]), initDragAndDrop(n, r), load_history_internal(), qa_tutorial_open_selected_button && (qa_tutorial_open_selected_button.onclick = function() {
     qa_tutorial_overlay.style.display = "block"
-  }, qa_tutorial_close_button.onclick = function() {
+  }), qa_tutorial_select && (qa_tutorial_select.onchange = function() {
+    update_tutorial(qa_tutorial_select.value, qa_tutorial_select.options[qa_tutorial_select.selectedIndex].textContent)
+  }), qa_populate_tutorial_select(), qa_tutorial_close_button.onclick = function() {
     qa_tutorial_overlay.style.display = "none"
   }, window.onclick = function(t) {
     t.target == qa_tutorial_overlay && (qa_tutorial_overlay.style.display = "none")
-  }, document.querySelectorAll(".qa-item").forEach(t => {
+  }, qa_populate_tutorial_select(), document.querySelectorAll(".qa-item").forEach(t => {
     void 0 !== tutorials[t.dataset.ds] && (t.onmouseover = function() {
       update_tutorial(t.dataset.ds, t.innerHTML)
     })

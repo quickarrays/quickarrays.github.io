@@ -1992,7 +1992,7 @@ function defineStructure(def) {
         displayHtml: "size(" + (def.displayHtml || def.id) + ")",
         tooltip: "Number of factors in " + (def.displayHtml || def.id),
         deps: [def.id],
-        compute: (ctx, str) => number_of_runs(str)
+        compute: (ctx, fact) => number_of_factors(fact)
       });
       defineCounterAssociation(def.id, def.id);
     }

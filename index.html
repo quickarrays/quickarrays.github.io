@@ -441,8 +441,6 @@ body {
     <div class=qa-description>Choose your counters
       <input type=checkbox id=qa-counter-automatic value=1 checked>
       <label for=qa-counter-automatic>automatically</label>.
-      &nbsp;&nbsp;
-      A text counters returns the size of its run length encoding, a factorization counter the numbers of its factors.
     </div>
     <div class="qa-hidden qa-itemlist" id="qa-counter-itemlists">
       <div id="qa-counter-enabled" class="qa-itemlist-enabled">
@@ -3103,7 +3101,16 @@ window.onload = function() {
     r = document.getElementById("qa-counter-disabled");
   structures_list = new DataStructureList(t, e, updateArrays, !0), document.querySelectorAll(".qa-structure").forEach(t => {
     structures_list.add(t)
-  }), structures_default = structures_list.getEnabled(), counters_list = new CounterList(n, r, updateArrays, !0), document.querySelectorAll(".qa-counter").forEach(t => {
+  });
+
+  // Default enabled structures (and their order).
+  // If and only if exactly these are enabled (in this order), we omit the
+  // "structures" URL parameter.
+  const QA_DEFAULT_STRUCTURES = "index_array-text-suffix_array-inverse_suffix_array";
+  structures_list.setEnabled(QA_DEFAULT_STRUCTURES);
+  structures_default = QA_DEFAULT_STRUCTURES;
+
+  counters_list = new CounterList(n, r, updateArrays, !0), document.querySelectorAll(".qa-counter").forEach(t => {
     counters_list.add(t)
   }), counters_default = counters_list.getEnabled(), options_list = new OptionList(updateArrays), document.querySelectorAll(".qa-option-cbx").forEach(t => {
     options_list.add(t)

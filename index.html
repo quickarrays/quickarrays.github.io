@@ -2025,7 +2025,7 @@ function defineStructure(def) {
         deps: [def.id],
         compute: (ctx, str) => number_of_runs(str)
       });
-      defineCounterAssociation(def.id, def.id);
+      defineCounterAssociation(def.id, def.id + "_runs");
     } else if (def.type === "factorization") {
       defineCounter({
         id: def.id + "_size",
@@ -2034,7 +2034,7 @@ function defineStructure(def) {
         deps: [def.id],
         compute: (ctx, fact) => number_of_factors(fact)
       });
-      defineCounterAssociation(def.id, def.id);
+      defineCounterAssociation(def.id, def.id + "_size");
     }
   }
 }
